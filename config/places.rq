@@ -14,6 +14,7 @@ CONSTRUCT {
         gn:countryCode ?countryCode ;
         gn:featureClass ?featureClass ;
         gn:featureCode ?featureCode ;
+        gn:population ?populationInt ;
         gn:parentADM1 ?parentAdm1 ;
         gn:parentADM2 ?parentAdm2 ;
         wgs84_pos:lat ?latitudeFloat ;
@@ -35,11 +36,17 @@ WHERE {
             xyz:country%20code ?countryCode ;
             xyz:feature%20class ?featureClassString ;
             xyz:feature%20code ?featureCodeString ;
-            xyz:adm1 ?adm1 ;
-            xyz:adm2 ?adm2 ; # Not all places have a parentAdm2, but we use a special ‘NONE’ value so we can join non-OPTIONALly.
             xyz:latitude ?latitude ;
             xyz:longitude ?longitude ;
+            xyz:adm1 ?adm1 ;
+            xyz:adm2 ?adm2 ; # Not all places have a parentAdm2, but we use a special 'NONE' value so we can join non-OPTIONALly.
         .
+
+        OPTIONAL {
+            ?s xyz:population ?population .
+            FILTER(?population != "0")
+            BIND(xsd:integer(?population) AS ?populationInt)
+        }
 
         OPTIONAL {
             ?s xyz:alternatenames ?alternateNameString .
