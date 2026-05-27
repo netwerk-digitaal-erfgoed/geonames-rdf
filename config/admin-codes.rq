@@ -4,7 +4,6 @@ PREFIX gn: <https://www.geonames.org/ontology#>
 PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
-PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
 CONSTRUCT {
     ?adm1Uri xyz:admin1Code ?adm1 .
