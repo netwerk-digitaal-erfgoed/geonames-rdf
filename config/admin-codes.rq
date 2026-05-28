@@ -15,7 +15,6 @@ WHERE {
             fx:properties fx:location "data/admin1-codes.csv" ;
                 fx:csv.delimiter "\t" ;
                 fx:csv.headers true ;
-                fx:csv.quote-char "\u0001" ;
             .
             [
                 xyz:admin1code ?adm1 ;
@@ -29,7 +28,6 @@ WHERE {
             fx:properties fx:location "data/admin2-codes.csv" ;
                 fx:csv.delimiter "\t" ;
                 fx:csv.headers true ;
-                fx:csv.quote-char "\u0001" ;
             .
             [
                 xyz:admin2code ?adm2 ;
