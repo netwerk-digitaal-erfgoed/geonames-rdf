@@ -13,3 +13,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # SPARQL Anything v1.1.0 only tests on Java 21 upstream; don't auto-bump
+      # the JRE major until that changes. Patch updates within 21-jre still flow.
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
