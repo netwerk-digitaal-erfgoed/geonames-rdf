@@ -29,7 +29,7 @@ WHERE {
             fx:null-string "" ; # Skip empty alternate names.
             fx:csv.delimiter "\t" ;
             fx:csv.headers true ;
-            fx:csv.quote-char "\u0001" ; # GeoNames TSV is unquoted but contains literal '"' in some names; pick a control char that never appears in the data so Apache Commons CSV treats '"' as plain data.
+            fx:csv.quote-char "\u0001" ; # GeoNames TSV is unquoted but contains literal '"' in some names (e.g. '"Kostas Tsianos" Theatre'); pick a control char that never appears in the data so Apache Commons CSV treats '"' as plain data.
         .
 
         ?s xyz:geonameid ?id ;
