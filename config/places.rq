@@ -34,7 +34,6 @@ WHERE {
 
         ?s xyz:geonameid ?id ;
             xyz:name ?name ;
-            xyz:country%20code ?countryCode ;
             xyz:feature%20class ?featureClassString ;
             xyz:feature%20code ?featureCodeString ;
             xyz:latitude ?latitude ;
@@ -42,6 +41,13 @@ WHERE {
             xyz:adm1 ?adm1 ;
             xyz:adm2 ?adm2 ; # Not all places have a parentAdm2, but we use a special 'NONE' value so we can join non-OPTIONALly.
         .
+
+        # Continents have no country code, which fx:null-string drops, so the required
+        # country-code pattern omitted them. Bind it OPTIONALly and keep country-less features
+        # only when they are continents (feature code L.CONT); other country-less features
+        # (oceans, undersea features, the planet) stay out of scope.
+        OPTIONAL { ?s xyz:country%20code ?countryCode }
+        FILTER(BOUND(?countryCode) || (?featureClassString = "L" && ?featureCodeString = "CONT"))
 
         OPTIONAL {
             ?s xyz:population ?population .
