@@ -1,4 +1,8 @@
 #!/bin/sh
+# Abort on the first error so a crashing chunk fails the build loudly instead of
+# silently dropping ~1M rows from the output while the job stays green.
+set -eu
+
 DATA_DIR="$PWD/data"
 BIN_DIR="$PWD/bin"
 CONFIG_DIR="$PWD/config"
@@ -16,8 +20,14 @@ fi
 # Map admin codes.
 java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DIR/admin-codes.ttl
 
+# Remove stale chunk outputs from a previous run, so the cat below can only pick up .ttl files
+# this run produced (relevant when map.sh is run standalone without download.sh).
+rm -f $DATA_DIR/geonames_*.csv.ttl
+
 # Iterate over chunks and run them through SPARQL Anything individually to prevent OOMs.
-trap "exit 1" INT
+# set -e aborts the run if a chunk crashes (SPARQL Anything v1.1.0+ deletes its output on a
+# crash, so the cat below would otherwise silently omit it); the "Processing" line above
+# identifies the failing chunk.
 for f in $DATA_DIR/geonames_*.csv; do
     echo "Processing $f"
     java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR --query "$(sed "s|{SOURCE}|$f|" $CONFIG_DIR/places.rq)" --load $DATA_DIR/admin-codes.ttl --output $f.ttl
