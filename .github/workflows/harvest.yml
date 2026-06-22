@@ -18,11 +18,11 @@ jobs:
       - run: ./map.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: geonames-ttl
-          path: output/geonames.ttl
+          name: geonames-nt
+          path: output/geonames.nt
       - run: |
           cd output
-          zip -r geonames.zip geonames.ttl
+          zip -r geonames.zip geonames.nt
       - uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.S3_ACCESS_KEY}}

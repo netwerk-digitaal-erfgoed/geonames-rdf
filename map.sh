@@ -20,9 +20,9 @@ fi
 # Map admin codes.
 java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DIR/admin-codes.ttl
 
-# Remove stale chunk outputs from a previous run, so the cat below can only pick up .ttl files
+# Remove stale chunk outputs from a previous run, so the cat below can only pick up .nt files
 # this run produced (relevant when map.sh is run standalone without download.sh).
-rm -f $DATA_DIR/geonames_*.csv.ttl
+rm -f $DATA_DIR/geonames_*.csv.nt
 
 # Iterate over chunks and run them through SPARQL Anything individually to prevent OOMs.
 # set -e aborts the run if a chunk crashes (SPARQL Anything v1.1.0+ deletes its output on a
@@ -30,7 +30,9 @@ rm -f $DATA_DIR/geonames_*.csv.ttl
 # identifies the failing chunk.
 for f in $DATA_DIR/geonames_*.csv; do
     echo "Processing $f"
-    java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR --query "$(sed "s|{SOURCE}|$f|" $CONFIG_DIR/places.rq)" --load $DATA_DIR/admin-codes.ttl --output $f.ttl
+    java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR --query "$(sed "s|{SOURCE}|$f|" $CONFIG_DIR/places.rq)" --load $DATA_DIR/admin-codes.ttl --format NT --output $f.nt
 done
 
-cat $DATA_DIR/*.csv.ttl > $OUTPUT_DIR/geonames.ttl
+# Concatenate the per-chunk N-Triples files. Unlike Turtle, N-Triples has no prefixes or
+# document structure: every line is a self-contained triple, so plain cat is always valid.
+cat $DATA_DIR/*.csv.nt > $OUTPUT_DIR/geonames.nt
