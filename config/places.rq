@@ -24,12 +24,12 @@ WHERE {
     SERVICE <x-sparql-anything:> {
         fx:properties
             fx:location "{SOURCE}" ;
-            fx:ondisk "/tmp/sparql-anything-geonames" ; # Ondisk storage is slower but required to prevent OOM.
-            fx:ondisk.reuse false ; # Prevents OOM.
+            fx:slice true ; # Stream the chunk in row batches instead of loading it whole; replaces the slow fx:ondisk. Needs SPARQL Anything >= 1.2 (https://github.com/SPARQL-Anything/sparql.anything/issues/624).
+            fx:slice.size "1000" ; # Rows per query execution: bounds input memory while keeping throughput high.
             fx:null-string "" ; # Skip empty alternate names.
             fx:csv.delimiter "\t" ;
             fx:csv.headers true ;
-            fx:csv.quote-char "\u0001" ; # GeoNames TSV is unquoted but contains literal '"' in some names (e.g. '"Kostas Tsianos" Theatre'); pick a control char that never appears in the data so Apache Commons CSV treats '"' as plain data.
+            fx:csv.quote-char "false" ; # GeoNames TSV is unquoted but contains literal '"' in some names (e.g. '"Kostas Tsianos" Theatre'); disable quoting so Apache Commons CSV treats '"' as plain data. Needs SPARQL Anything >= 1.2 (https://github.com/SPARQL-Anything/sparql.anything/issues/625).
         .
 
         ?s xyz:geonameid ?id ;

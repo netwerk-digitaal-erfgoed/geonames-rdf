@@ -6,8 +6,8 @@ set -eu
 DATA_DIR="$PWD/data"
 BIN_DIR="$PWD/bin"
 CONFIG_DIR="$PWD/config"
-: "${SPARQL_ANYTHING_VERSION:=v1.1.0}"
-: "${SPARQL_ANYTHING_JAR:=sparql-anything-$SPARQL_ANYTHING_VERSION.jar}"
+# SPARQL Anything version/jar are pinned in one place, shared with the Dockerfile.
+. "$PWD/sparql-anything.env"
 : "${OUTPUT_DIR:=$PWD/output}"
 
 mkdir -p $OUTPUT_DIR
