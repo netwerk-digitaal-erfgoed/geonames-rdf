@@ -24,14 +24,24 @@ java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DI
 # this run produced (relevant when map.sh is run standalone without download.sh).
 rm -f $DATA_DIR/geonames_*.csv.nt
 
-# Iterate over chunks and run them through SPARQL Anything individually to prevent OOMs.
-# set -e aborts the run if a chunk crashes (SPARQL Anything v1.1.0+ deletes its output on a
-# crash, so the cat below would otherwise silently omit it); the "Processing" line above
-# identifies the failing chunk.
-for f in $DATA_DIR/geonames_*.csv; do
+# Number of chunks to map concurrently. Defaults to the number of CPUs (4 on a GitHub-hosted
+# ubuntu runner); override with the PARALLELISM env var. Each worker is a separate JVM holding
+# one chunk's result graph in memory (~1 GB for a 1M-row chunk), so PARALLELISM x per-JVM heap
+# must fit RAM: -Xmx2g below keeps four concurrent workers well within a 16 GB runner.
+PARALLELISM="${PARALLELISM:-$(nproc 2>/dev/null || echo 4)}"
+
+# Map each chunk in its own JVM, PARALLELISM at a time, to use every core. Running one JVM per
+# chunk also bounds memory: SPARQL Anything materialises the whole chunk's result graph before
+# writing, and each process frees it on exit (a single JVM over the full dataset needs >14 GB
+# and OOMs). If any chunk crashes, xargs exits non-zero and set -e aborts the build; SPARQL
+# Anything deletes a crashed chunk's output, so the cat below would otherwise silently omit it.
+# The "Processing" lines identify chunks (interleaved under parallelism).
+export BIN_DIR CONFIG_DIR DATA_DIR SPARQL_ANYTHING_JAR
+printf '%s\n' $DATA_DIR/geonames_*.csv | xargs -P "$PARALLELISM" -I{} sh -c '
+    f="$1"
     echo "Processing $f"
-    java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR --query "$(sed "s|{SOURCE}|$f|" $CONFIG_DIR/places.rq)" --load $DATA_DIR/admin-codes.ttl --format NT --output $f.nt
-done
+    java -Xmx2g -jar "$BIN_DIR/$SPARQL_ANYTHING_JAR" --query "$(sed "s|{SOURCE}|$f|" "$CONFIG_DIR/places.rq")" --load "$DATA_DIR/admin-codes.ttl" --format NT --output "$f.nt"
+' _ {}
 
 # Concatenate the per-chunk N-Triples files. Unlike Turtle, N-Triples has no prefixes or
 # document structure: every line is a self-contained triple, so plain cat is always valid.
