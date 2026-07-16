@@ -24,23 +24,48 @@ java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DI
 # this run produced (relevant when map.sh is run standalone without download.sh).
 rm -f $DATA_DIR/geonames_*.csv.nt
 
-# Number of chunks to map concurrently. Defaults to the number of CPUs (4 on a GitHub-hosted
-# ubuntu runner); override with the PARALLELISM env var. Each worker is a separate JVM holding
-# one chunk's result graph in memory (~1 GB for a 1M-row chunk), so PARALLELISM x per-JVM heap
-# must fit RAM: -Xmx2g below keeps four concurrent workers well within a 16 GB runner.
-PARALLELISM="${PARALLELISM:-$(nproc 2>/dev/null || echo 4)}"
+# Per-worker JVM heap. A 1M-row chunk's result graph needs ~1.2 GB, so 2g leaves margin.
+# Raise JAVA_XMX (and lower PARALLELISM to match) if CHUNK_SIZE in download.sh is increased.
+JAVA_XMX="${JAVA_XMX:-2g}"
 
-# Map each chunk in its own JVM, PARALLELISM at a time, to use every core. Running one JVM per
-# chunk also bounds memory: SPARQL Anything materialises the whole chunk's result graph before
-# writing, and each process frees it on exit (a single JVM over the full dataset needs >14 GB
-# and OOMs). If any chunk crashes, xargs exits non-zero and set -e aborts the build; SPARQL
-# Anything deletes a crashed chunk's output, so the cat below would otherwise silently omit it.
-# The "Processing" lines identify chunks (interleaved under parallelism).
-export BIN_DIR CONFIG_DIR DATA_DIR SPARQL_ANYTHING_JAR
+# Number of chunks to map concurrently. Each chunk runs in its own JVM, which also bounds
+# memory: SPARQL Anything materialises the whole chunk's result graph before writing, and
+# each process frees it on exit (a single JVM over the full dataset needs >14 GB and OOMs).
+# The workers run at once, so PARALLELISM x per-worker memory must fit RAM. Default to the CPU
+# count, but cap it to what memory allows -- the cgroup limit inside a container, else physical
+# RAM -- so we don't over-subscribe on a host with many cores but little memory (e.g. a
+# memory-limited pod running the published image). Set PARALLELISM explicitly to override.
+if [ -z "${PARALLELISM:-}" ]; then
+    PARALLELISM=$(nproc 2>/dev/null || echo 4)
+    mem_mb=0
+    if [ -r /sys/fs/cgroup/memory.max ]; then                           # cgroup v2
+        max=$(cat /sys/fs/cgroup/memory.max)
+        [ "$max" != max ] && mem_mb=$((max / 1048576))
+    elif [ -r /sys/fs/cgroup/memory/memory.limit_in_bytes ]; then       # cgroup v1
+        max=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+        [ "$max" -lt 9000000000000000000 ] 2>/dev/null && mem_mb=$((max / 1048576))
+    fi
+    [ "$mem_mb" -eq 0 ] && [ -r /proc/meminfo ] &&                      # non-container host
+        mem_mb=$(awk '/^MemTotal:/{print int($2 / 1024); exit}' /proc/meminfo)
+    # Budget ~3 GB per worker (JAVA_XMX=2g heap + non-heap and OS headroom).
+    if [ "$mem_mb" -gt 0 ]; then
+        mem_cap=$((mem_mb / 3072))
+        [ "$mem_cap" -lt 1 ] && mem_cap=1
+        [ "$mem_cap" -lt "$PARALLELISM" ] && PARALLELISM=$mem_cap
+    fi
+fi
+echo "Mapping chunks with PARALLELISM=$PARALLELISM, -Xmx$JAVA_XMX per worker"
+
+# Map each chunk. If a chunk crashes, its worker prints a marker naming it and exits non-zero,
+# so xargs exits non-zero and set -e aborts the build before the cat below (SPARQL Anything
+# deletes a crashed chunk's output, so cat would otherwise silently ship a short file). Note
+# xargs still starts the remaining queued chunks before aborting; --output lines interleave.
+export BIN_DIR CONFIG_DIR DATA_DIR SPARQL_ANYTHING_JAR JAVA_XMX
 printf '%s\n' $DATA_DIR/geonames_*.csv | xargs -P "$PARALLELISM" -I{} sh -c '
-    f="$1"
-    echo "Processing $f"
-    java -Xmx2g -jar "$BIN_DIR/$SPARQL_ANYTHING_JAR" --query "$(sed "s|{SOURCE}|$f|" "$CONFIG_DIR/places.rq")" --load "$DATA_DIR/admin-codes.ttl" --format NT --output "$f.nt"
+    chunk="$1"
+    echo "Processing $chunk"
+    java -Xmx"$JAVA_XMX" -jar "$BIN_DIR/$SPARQL_ANYTHING_JAR" --query "$(sed "s|{SOURCE}|$chunk|" "$CONFIG_DIR/places.rq")" --load "$DATA_DIR/admin-codes.ttl" --format NT --output "$chunk.nt" \
+        || { echo "Failed to map chunk: $chunk" >&2; exit 1; }
 ' _ {}
 
 # Concatenate the per-chunk N-Triples files. Unlike Turtle, N-Triples has no prefixes or
