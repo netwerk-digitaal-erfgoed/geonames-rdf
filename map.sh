@@ -12,9 +12,10 @@ CONFIG_DIR="$PWD/config"
 
 mkdir -p $OUTPUT_DIR
 
-# Download SPARQL Anything CLI.
+# Download SPARQL Anything CLI. -f so a missing release fails here instead of writing GitHub’s
+# 404 page to the jar path, which surfaces much later as “Invalid or corrupt jarfile”.
 if [ ! -f "$BIN_DIR/$SPARQL_ANYTHING_JAR" ]; then
-    curl -sSL "https://github.com/SPARQL-Anything/sparql.anything/releases/download/$SPARQL_ANYTHING_VERSION/$SPARQL_ANYTHING_JAR" -o $BIN_DIR/$SPARQL_ANYTHING_JAR
+    curl -fsSL "https://github.com/SPARQL-Anything/sparql.anything/releases/download/$SPARQL_ANYTHING_VERSION/$SPARQL_ANYTHING_JAR" -o $BIN_DIR/$SPARQL_ANYTHING_JAR
 fi
 
 # Map admin codes.
