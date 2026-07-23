@@ -20,9 +20,23 @@ jobs:
         with:
           name: geonames-nt
           path: output/geonames.nt
+      # Publish two encodings of the same N-Triples file:
+      # - geonames.nt.gz is the one to consume. Loaders read gzip natively (Jena infers it from
+      #   the .gz extension), so they load it without an unzip step or staging ~14 GB of plain text.
+      # - geonames.zip stays for existing consumers of that URL, which we must not break.
+      # Both use DEFLATE level 9: it is ~10% smaller than zip's default level 6 (858 MB -> ~773 MB)
+      # for ~3x the CPU, which costs a few minutes on a job that already runs 24 and only weekly.
       - run: |
           cd output
-          zip -r geonames.zip geonames.nt
+          gzip -9 -k geonames.nt
+          zip -9 geonames.zip geonames.nt
+      - uses: BetaHuhn/do-spaces-action@v2
+        with:
+          access_key: ${{ secrets.S3_ACCESS_KEY}}
+          secret_key: ${{ secrets.S3_SECRET_KEY }}
+          space_name: geonames
+          space_region: ams3
+          source: output/geonames.nt.gz
       - uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.S3_ACCESS_KEY}}
