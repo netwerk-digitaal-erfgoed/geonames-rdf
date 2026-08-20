@@ -10,6 +10,12 @@ PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 # gn:alternateName. We keep them, so consumers can avoid promoting an obsolete name such as
 # 'West Germany' to a preferred label. All five predicates are in the GeoNames ontology:
 # gn:officialName is rdfs:subPropertyOf skos:prefLabel, the other four sit under skos:altLabel.
+#
+# The flags are not mutually exclusive, so their order below matters. isHistoric and isColloquial
+# are tested first, because they are the two that must never reach a preferred label: 2,199 rows
+# set one of them together with isPreferredName or isShortName, and 965 of those would otherwise
+# become gn:officialName – an obsolete or slang name asserted as a skos:prefLabel. about.rdf has
+# the opposite priority, but only because it has no historic or colloquial predicate to lose to.
 CONSTRUCT {
     ?uri ?predicate ?label .
 }
@@ -46,9 +52,9 @@ WHERE {
         BIND(URI(CONCAT("https://sws.geonames.org/", ?id, "/")) AS ?uri)
         BIND(IF(BOUND(?language), STRLANG(?name, ?language), ?name) AS ?label)
         BIND(URI(CONCAT("https://www.geonames.org/ontology#",
-            IF(BOUND(?isPreferredName), "officialName",
-            IF(BOUND(?isShortName), "shortName",
+            IF(BOUND(?isHistoric), "historicalName",
             IF(BOUND(?isColloquial), "colloquialName",
-            IF(BOUND(?isHistoric), "historicalName", "alternateName")))))) AS ?predicate)
+            IF(BOUND(?isPreferredName), "officialName",
+            IF(BOUND(?isShortName), "shortName", "alternateName")))))) AS ?predicate)
     }
 }

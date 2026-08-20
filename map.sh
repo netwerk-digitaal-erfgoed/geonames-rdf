@@ -67,7 +67,12 @@ echo "Mapping chunks with PARALLELISM=$PARALLELISM, -Xmx$JAVA_XMX per worker"
 # triple per row, no admin-codes join). The geonames chunks are listed first so the long jobs
 # start first and the short ones fill the tail.
 export BIN_DIR CONFIG_DIR DATA_DIR SPARQL_ANYTHING_JAR JAVA_XMX
-printf '%s\n' $DATA_DIR/geonames_*.csv $DATA_DIR/alternate-names_*.csv | xargs -P "$PARALLELISM" -I{} sh -c '
+# Skip an unmatched glob rather than feeding the pattern itself to a worker, which would fail the
+# whole run after every real chunk had already been mapped. Relevant when map.sh runs standalone
+# against a data/ directory that predates one of the two chunk sets.
+for chunk in $DATA_DIR/geonames_*.csv $DATA_DIR/alternate-names_*.csv; do
+    if [ -f "$chunk" ]; then printf '%s\n' "$chunk"; fi
+done | xargs -P "$PARALLELISM" -I{} sh -c '
     chunk="$1"
     echo "Processing $chunk"
     case "$chunk" in
