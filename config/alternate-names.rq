@@ -1,0 +1,54 @@
+PREFIX fx: <http://sparql.xyz/facade-x/ns/>
+PREFIX xyz: <http://sparql.xyz/facade-x/data/>
+
+# Map GeoNames' alternateNamesV2 table to language-tagged names. The `alternatenames` column in
+# the main table is a comma-separated list without language codes (and is corrupted by names that
+# themselves contain a comma), so this table is the only source of language information.
+#
+# The predicate follows GeoNames' own RDF (https://sws.geonames.org/2921044/about.rdf), except
+# that about.rdf discards isColloquial and isHistoric and emits those rows as plain
+# gn:alternateName. We keep them, so consumers can avoid promoting an obsolete name such as
+# 'West Germany' to a preferred label. All five predicates are in the GeoNames ontology:
+# gn:officialName is rdfs:subPropertyOf skos:prefLabel, the other four sit under skos:altLabel.
+CONSTRUCT {
+    ?uri ?predicate ?label .
+}
+WHERE {
+    SERVICE <x-sparql-anything:> {
+        fx:properties
+            fx:location "{SOURCE}" ;
+            fx:slice true ; # Stream the chunk in row batches instead of loading it whole.
+            fx:slice.size "1000" ;
+            fx:null-string "" ; # Leaves the language and flag columns unbound when empty.
+            fx:csv.delimiter "\t" ;
+            fx:csv.headers true ;
+            fx:csv.quote-char "false" ; # As in places.rq: the TSV is unquoted but names contain literal '"'.
+        .
+
+        ?s xyz:geonameid ?id ;
+            xyz:alternate%20name ?name ;
+        .
+
+        OPTIONAL { ?s xyz:isolanguage ?language }
+        OPTIONAL { ?s xyz:isPreferredName ?isPreferredName }
+        OPTIONAL { ?s xyz:isShortName ?isShortName }
+        OPTIONAL { ?s xyz:isColloquial ?isColloquial }
+        OPTIONAL { ?s xyz:isHistoric ?isHistoric }
+
+        # The isolanguage column doubles as a slot for non-linguistic identifiers: 'wkdt' for the
+        # Wikidata ID, 'link' for a URL, plus 'post', 'iata', 'icao', 'nuts', 'unlc' and others that
+        # the readme does not enumerate. Since the set is open-ended, allow only plain ISO 639
+        # codes rather than blocking known offenders. This also drops language variants such as
+        # 'zh-Hant', which about.rdf drops too. See https://github.com/netwerk-digitaal-erfgoed/geonames-rdf/issues/41
+        # for publishing the Wikidata IDs.
+        FILTER(!BOUND(?language) || REGEX(?language, "^[a-z]{2,3}$"))
+
+        BIND(URI(CONCAT("https://sws.geonames.org/", ?id, "/")) AS ?uri)
+        BIND(IF(BOUND(?language), STRLANG(?name, ?language), ?name) AS ?label)
+        BIND(URI(CONCAT("https://www.geonames.org/ontology#",
+            IF(BOUND(?isPreferredName), "officialName",
+            IF(BOUND(?isShortName), "shortName",
+            IF(BOUND(?isColloquial), "colloquialName",
+            IF(BOUND(?isHistoric), "historicalName", "alternateName")))))) AS ?predicate)
+    }
+}

@@ -23,7 +23,7 @@ java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DI
 
 # Remove stale chunk outputs from a previous run, so the cat below can only pick up .nt files
 # this run produced (relevant when map.sh is run standalone without download.sh).
-rm -f $DATA_DIR/geonames_*.csv.nt
+rm -f $DATA_DIR/*.csv.nt
 
 # Per-worker JVM heap. A 1M-row chunk's result graph needs ~1.2 GB, so 2g leaves margin.
 # Raise JAVA_XMX (and lower PARALLELISM to match) if CHUNK_SIZE in download.sh is increased.
@@ -61,11 +61,21 @@ echo "Mapping chunks with PARALLELISM=$PARALLELISM, -Xmx$JAVA_XMX per worker"
 # so xargs exits non-zero and set -e aborts the build before the cat below (SPARQL Anything
 # deletes a crashed chunk's output, so cat would otherwise silently ship a short file). Note
 # xargs still starts the remaining queued chunks before aborting; --output lines interleave.
+#
+# Both chunk sets go through one worker pool, which packs the cores better than draining them in
+# two phases: an alternate-names chunk is roughly a quarter of the work of a geonames chunk (one
+# triple per row, no admin-codes join). The geonames chunks are listed first so the long jobs
+# start first and the short ones fill the tail.
 export BIN_DIR CONFIG_DIR DATA_DIR SPARQL_ANYTHING_JAR JAVA_XMX
-printf '%s\n' $DATA_DIR/geonames_*.csv | xargs -P "$PARALLELISM" -I{} sh -c '
+printf '%s\n' $DATA_DIR/geonames_*.csv $DATA_DIR/alternate-names_*.csv | xargs -P "$PARALLELISM" -I{} sh -c '
     chunk="$1"
     echo "Processing $chunk"
-    java -Xmx"$JAVA_XMX" -jar "$BIN_DIR/$SPARQL_ANYTHING_JAR" --query "$(sed "s|{SOURCE}|$chunk|" "$CONFIG_DIR/places.rq")" --load "$DATA_DIR/admin-codes.ttl" --format NT --output "$chunk.nt" \
+    case "$chunk" in
+        # Alternate names key on geonameid, so they need neither the admin-codes graph nor a join.
+        */alternate-names_*) query="$CONFIG_DIR/alternate-names.rq"; set -- ;;
+        *)                   query="$CONFIG_DIR/places.rq"; set -- --load "$DATA_DIR/admin-codes.ttl" ;;
+    esac
+    java -Xmx"$JAVA_XMX" -jar "$BIN_DIR/$SPARQL_ANYTHING_JAR" --query "$(sed "s|{SOURCE}|$chunk|" "$query")" "$@" --format NT --output "$chunk.nt" \
         || { echo "Failed to map chunk: $chunk" >&2; exit 1; }
 ' _ {}
 

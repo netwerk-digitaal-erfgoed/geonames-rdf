@@ -41,4 +41,10 @@ This will download SPARQL Anything if not already available.
 ## Output
 
 After running the transform process, you’ll find a `output/geonames.nt` file 
-that you can load into a SPARQL server. 
+that you can load into a SPARQL server.
+
+Names come from GeoNames’ [alternateNamesV2](https://download.geonames.org/export/dump/alternateNamesV2.zip)
+table, so they carry a language tag. Following GeoNames’ own RDF, a preferred name becomes
+`gn:officialName` and a short name `gn:shortName`; unlike that RDF, colloquial and historic names
+keep their distinction as `gn:colloquialName` and `gn:historicalName` instead of being flattened
+into `gn:alternateName`. `gn:name` remains the untagged main name from the dump’s `name` column. 

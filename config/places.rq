@@ -1,4 +1,3 @@
-PREFIX apf: <http://jena.apache.org/ARQ/property#>
 PREFIX fx: <http://sparql.xyz/facade-x/ns/>
 PREFIX gn: <https://www.geonames.org/ontology#>
 PREFIX xyz: <http://sparql.xyz/facade-x/data/>
@@ -10,7 +9,6 @@ CONSTRUCT {
     ?uri
         a gn:Feature ;
         gn:name ?name ;
-        gn:alternateName ?alternateName ;
         gn:countryCode ?countryCode ;
         gn:featureClass ?featureClass ;
         gn:featureCode ?featureCode ;
@@ -26,7 +24,7 @@ WHERE {
             fx:location "{SOURCE}" ;
             fx:slice true ; # Stream the chunk in row batches instead of loading it whole; replaces the slow fx:ondisk. Needs SPARQL Anything >= 1.2 (https://github.com/SPARQL-Anything/sparql.anything/issues/624).
             fx:slice.size "1000" ; # Rows per query execution: bounds input memory while keeping throughput high.
-            fx:null-string "" ; # Skip empty alternate names.
+            fx:null-string "" ; # Leaves empty columns (population, country code) unbound.
             fx:csv.delimiter "\t" ;
             fx:csv.headers true ;
             fx:csv.quote-char "false" ; # GeoNames TSV is unquoted but contains literal '"' in some names (e.g. '"Kostas Tsianos" Theatre'); disable quoting so Apache Commons CSV treats '"' as plain data. Needs SPARQL Anything >= 1.2 (https://github.com/SPARQL-Anything/sparql.anything/issues/625).
@@ -53,11 +51,6 @@ WHERE {
             ?s xyz:population ?population .
             FILTER(?population != "0")
             BIND(xsd:integer(?population) AS ?populationInt)
-        }
-
-        OPTIONAL {
-            ?s xyz:alternatenames ?alternateNameString .
-            ?alternateName apf:strSplit (?alternateNameString ",") .
         }
 
         BIND(URI(CONCAT("https://sws.geonames.org/", ?id, "/")) as ?uri)
