@@ -1,9 +1,11 @@
 PREFIX fx: <http://sparql.xyz/facade-x/ns/>
 PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 
-# Map GeoNames' alternateNamesV2 table to language-tagged names. The `alternatenames` column in
-# the main table is a comma-separated list without language codes (and is corrupted by names that
-# themselves contain a comma), so this table is the only source of language information.
+# Map GeoNames' alternateNamesV2 table to language-tagged names. The `alternatenames` column in the
+# main table is a comma-separated list carrying no language codes at all, so this table is the only
+# source of language information – as GeoNames' own readme puts it, "if you need to know the
+# language of a name variant, then you will need to load the table 'alternatenames' and you can drop
+# the column in the geoname table". Their RDF service builds names from this table too.
 #
 # The predicate follows GeoNames' own RDF (https://sws.geonames.org/2921044/about.rdf), except
 # that about.rdf discards isColloquial and isHistoric and emits those rows as plain
