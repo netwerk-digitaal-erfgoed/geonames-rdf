@@ -62,4 +62,24 @@ are emitted as plain literals. Following GeoNames’ own RDF, a preferred name b
 keep their distinction as `gn:colloquialName` and `gn:historicalName` instead of being flattened
 into `gn:alternateName`. A name flagged both historic (or colloquial) and preferred is published as
 historic, so an obsolete name never lands on `gn:officialName`, which the GeoNames ontology defines
-as a `skos:prefLabel`. `gn:name` remains the untagged main name from the dump’s `name` column. 
+as a `skos:prefLabel`. `gn:name` remains the untagged main name from the dump’s `name` column.
+
+The same table aligns 1,111,266 in-scope features to Wikidata, in rows whose language code is the
+pseudo-code `wkdt`. Each becomes a `schema:sameAs` to the Wikidata entity:
+
+```
+<https://sws.geonames.org/2921044/> <https://schema.org/sameAs> <http://www.wikidata.org/entity/Q183> .
+```
+
+The predicate is deliberately weaker than `owl:sameAs`. 340 QIDs are claimed by more than one
+feature, because Wikidata models the three Tihange reactors as one power station and Batifa’s town,
+ADM3 and district as one place, and 16 features carry more than one QID. An entailing predicate
+would merge their coordinates, populations and feature codes; `schema:sameAs` states the identity
+GeoNames asserts without entailing it, so every row is published and none of them is false. Neither
+GeoNames nor Wikidata asserts identity here either – GeoNames’ own `about.rdf` publishes no Wikidata
+link at all, and Wikidata links back with `wdtn:P1566`.
+
+The object keeps the `http` scheme although the predicate is `https`. That is not a typo:
+`http://www.wikidata.org/entity/` is the only form Wikidata’s dumps and its SPARQL endpoint use, and
+RDF compares URIs as strings, so the `https` variant is a different node that joins with nothing.
+

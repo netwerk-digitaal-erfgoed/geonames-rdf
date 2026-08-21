@@ -1,7 +1,8 @@
 PREFIX fx: <http://sparql.xyz/facade-x/ns/>
 PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 
-# Map GeoNames' alternateNamesV2 table to language-tagged names. The `alternatenames` column in the
+# Map GeoNames' alternateNamesV2 table to language-tagged names, and its 'wkdt' rows to Wikidata
+# links (see the comment on ?isWikidata below). The `alternatenames` column in the
 # main table is a comma-separated list carrying no language codes at all, so this table is the only
 # source of language information – as GeoNames' own readme puts it, "if you need to know the
 # language of a name variant, then you will need to load the table 'alternatenames' and you can drop
@@ -19,7 +20,7 @@ PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 # become gn:officialName – an obsolete or slang name asserted as a skos:prefLabel. about.rdf has
 # the opposite priority, but only because it has no historic or colloquial predicate to lose to.
 CONSTRUCT {
-    ?uri ?predicate ?label .
+    ?uri ?predicate ?object .
 }
 WHERE {
     SERVICE <x-sparql-anything:> {
@@ -47,8 +48,7 @@ WHERE {
         # Wikidata ID, 'link' for a URL, plus 'post', 'iata', 'icao', 'nuts', 'unlc' and others that
         # the readme does not enumerate. Since the set is open-ended, allow only plain ISO 639
         # codes rather than blocking known offenders. This also drops language variants such as
-        # 'zh-Hant', which about.rdf drops too. See https://github.com/netwerk-digitaal-erfgoed/geonames-rdf/issues/41
-        # for publishing the Wikidata IDs.
+        # 'zh-Hant', which about.rdf drops too. 'wkdt' is the one exception, mapped below.
         # The test is a variable rather than a bare FILTER because a FILTER constrains the whole
         # group and does not gate the BINDs beside it: the group translates to Filter(c, Extend(...)),
         # so STRLANG below is evaluated for every row, including the ones the FILTER then drops
@@ -62,14 +62,40 @@ WHERE {
         # non-alphanumeric character, 'fr_1793' (3,221 rows) is the sole offender: the other 44 are
         # xx-YY variants, and hyphens are allowed.
         BIND(BOUND(?language) && REGEX(?language, "^[a-z]{2,3}$") AS ?isLanguageTag)
-        FILTER(!BOUND(?language) || ?isLanguageTag)
+
+        # A 'wkdt' row carries a Wikidata QID rather than a name, for 1,111,266 in-scope features.
+        # GeoNames' own about.rdf publishes no Wikidata link at all – it offers gn:wikipediaArticle
+        # and an rdfs:seeAlso to DBpedia – and the ontology has no term to reuse: gn:wikipediaArticle
+        # has rdfs:range gn:WikipediaArticle, so borrowing it would make every RDFS reasoner infer
+        # that a Wikidata item is a Wikipedia article.
+        #
+        # schema:sameAs rather than owl:sameAs or skos:exactMatch, because neither GeoNames nor
+        # Wikidata asserts identity about this alignment and the data does not support it: 340 QIDs
+        # are claimed by more than one feature, since Wikidata models the three Tihange reactors as
+        # one power station and Batifa's town, ADM3 and district as one place. An entailing predicate
+        # would merge their coordinates, populations and feature codes. schema:sameAs states the
+        # identity GeoNames does assert – its definition names a 'Wikidata entry' explicitly – while
+        # entailing nothing, so those 340 are imprecise instead of false and no ambiguity filter is
+        # needed. 16 features carry more than one QID; all are published, for the same reason.
+        #
+        # The object keeps the http scheme even though the predicate is https. That is not a typo:
+        # http://www.wikidata.org/entity/ is the only form Wikidata's dumps and WDQS use, and RDF
+        # compares URIs as strings, so the https variant is a different node that joins with nothing.
+        BIND(BOUND(?language) && ?language = "wkdt" AS ?isWikidata)
+
+        FILTER(!BOUND(?language) || ?isLanguageTag || ?isWikidata)
 
         BIND(URI(CONCAT("https://sws.geonames.org/", ?id, "/")) AS ?uri)
-        BIND(IF(?isLanguageTag, STRLANG(?name, ?language), ?name) AS ?label)
-        BIND(URI(CONCAT("https://www.geonames.org/ontology#",
-            IF(BOUND(?isHistoric), "historicalName",
-            IF(BOUND(?isColloquial), "colloquialName",
-            IF(BOUND(?isPreferredName), "officialName",
-            IF(BOUND(?isShortName), "shortName", "alternateName")))))) AS ?predicate)
+        # ?isWikidata is tested outermost in both BINDs below: the name flags are not mutually
+        # exclusive with it either, and a 'wkdt' row does carry isPreferredName (geonameid 13405730
+        # among them), which would otherwise publish a QID as a gn:officialName – a skos:prefLabel.
+        BIND(IF(?isWikidata, URI(CONCAT("http://www.wikidata.org/entity/", ?name)),
+            IF(?isLanguageTag, STRLANG(?name, ?language), ?name)) AS ?object)
+        BIND(IF(?isWikidata, URI("https://schema.org/sameAs"),
+            URI(CONCAT("https://www.geonames.org/ontology#",
+                IF(BOUND(?isHistoric), "historicalName",
+                IF(BOUND(?isColloquial), "colloquialName",
+                IF(BOUND(?isPreferredName), "officialName",
+                IF(BOUND(?isShortName), "shortName", "alternateName"))))))) AS ?predicate)
     }
 }
