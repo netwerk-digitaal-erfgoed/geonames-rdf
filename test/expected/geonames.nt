@@ -7,6 +7,15 @@
 <https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#name> "City's Stadion \"Tomorri\"" .
 <https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/865730/> .
 <https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#parentADM2> <https://sws.geonames.org/10944368/> .
+<https://sws.geonames.org/13405730/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/13405730/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "37.17394"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/13405730/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "43.00818"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/13405730/> <https://schema.org/sameAs> <http://www.wikidata.org/entity/Q3666300> .
+<https://sws.geonames.org/13405730/> <https://www.geonames.org/ontology#countryCode> "IQ" .
+<https://sws.geonames.org/13405730/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
+<https://sws.geonames.org/13405730/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.ADM2> .
+<https://sws.geonames.org/13405730/> <https://www.geonames.org/ontology#name> "Batifa district" .
+<https://sws.geonames.org/13405730/> <https://www.geonames.org/ontology#population> "30000"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://sws.geonames.org/2658151/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/2658151/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "46.28382"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/2658151/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "6.16214"^^<http://www.w3.org/2001/XMLSchema#float> .
@@ -42,6 +51,7 @@
 <https://sws.geonames.org/2921044/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.5"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.5"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2921044/> <https://schema.org/sameAs> <http://www.wikidata.org/entity/Q183> .
 <https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Duitschland" .
 <https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Federal Republic of Germany"@en .
 <https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#countryCode> "DE" .
@@ -95,3 +105,12 @@
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#name> "German Democratic Republic" .
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#officialName> "German Democratic Republic"@en .
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#shortName> "East Germany"@en .
+<https://sws.geonames.org/97825/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/97825/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "37.17454"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/97825/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "43.01233"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/97825/> <https://schema.org/sameAs> <http://www.wikidata.org/entity/Q3666300> .
+<https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#countryCode> "IQ" .
+<https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#P> .
+<https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#P.PPLA2> .
+<https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#name> "Batifa" .
+<https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#population> "28000"^^<http://www.w3.org/2001/XMLSchema#integer> .
