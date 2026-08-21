@@ -49,10 +49,23 @@ WHERE {
         # codes rather than blocking known offenders. This also drops language variants such as
         # 'zh-Hant', which about.rdf drops too. See https://github.com/netwerk-digitaal-erfgoed/geonames-rdf/issues/41
         # for publishing the Wikidata IDs.
-        FILTER(!BOUND(?language) || REGEX(?language, "^[a-z]{2,3}$"))
+        # The test is a variable rather than a bare FILTER because a FILTER constrains the whole
+        # group and does not gate the BINDs beside it: the group translates to Filter(c, Extend(...)),
+        # so STRLANG below is evaluated for every row, including the ones the FILTER then drops
+        # (SPARQL 1.1 sections 18.2.4 and 18.5).
+        #
+        # That would be harmless on its own – section 18.5 leaves the variable unbound when an
+        # expression errors – but Jena 6.0.0 raises IllegalFormatConversionException from inside the
+        # error path for a bad tag, rather than the ExprEvalException ARQ treats as an expression
+        # error, so it escapes and kills the run with no usable message. Jena checks characters
+        # only, not the language registry ('1' and 'zz9' are accepted), so of the 45 codes holding a
+        # non-alphanumeric character, 'fr_1793' (3,221 rows) is the sole offender: the other 44 are
+        # xx-YY variants, and hyphens are allowed.
+        BIND(BOUND(?language) && REGEX(?language, "^[a-z]{2,3}$") AS ?isLanguageTag)
+        FILTER(!BOUND(?language) || ?isLanguageTag)
 
         BIND(URI(CONCAT("https://sws.geonames.org/", ?id, "/")) AS ?uri)
-        BIND(IF(BOUND(?language), STRLANG(?name, ?language), ?name) AS ?label)
+        BIND(IF(?isLanguageTag, STRLANG(?name, ?language), ?name) AS ?label)
         BIND(URI(CONCAT("https://www.geonames.org/ontology#",
             IF(BOUND(?isHistoric), "historicalName",
             IF(BOUND(?isColloquial), "colloquialName",
