@@ -38,6 +38,18 @@ Then start the mapping process with:
 
 This will download SPARQL Anything if not already available.
 
+## Tests
+
+`./test.sh` maps the fixtures in `test/fixtures` with the real `map.sh` and compares the result
+with `test/expected/geonames.nt`. It downloads nothing: the fixtures are already chunked and carry
+the header row the queries expect, which is what `download.sh` would otherwise produce.
+
+The fixtures are rows lifted from the GeoNames dumps, each chosen for a rule the mapping depends
+on – a name flagged both preferred and historic, an `fr_1793` code that is not a language tag, a
+feature with no country code, a name containing a double quote. After deliberately changing a
+query, re-run with `./test.sh --bless` and read the diff: the expected file is small enough to
+review line by line, and that review is the actual test.
+
 ## Output
 
 After running the transform process, you’ll find a `output/geonames.nt` file 

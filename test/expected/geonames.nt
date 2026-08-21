@@ -1,0 +1,97 @@
+<https://sws.geonames.org/11204054/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/11204054/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "40.69894"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/11204054/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "19.96434"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#countryCode> "AL" .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#S> .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#S.STDM> .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#name> "City's Stadion \"Tomorri\"" .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/865730/> .
+<https://sws.geonames.org/11204054/> <https://www.geonames.org/ontology#parentADM2> <https://sws.geonames.org/10944368/> .
+<https://sws.geonames.org/2658151/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/2658151/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "46.28382"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2658151/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "6.16214"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#alternateName> "Versoix" .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#countryCode> "CH" .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#P> .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#P.PPL> .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#name> "Versoix" .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/2660645/> .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#parentADM2> <https://sws.geonames.org/6458783/> .
+<https://sws.geonames.org/2658151/> <https://www.geonames.org/ontology#population> "11467"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/2743698/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/2743698/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2743698/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "4.66667"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#alternateName> "Provincie Zuid-Holland" .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#countryCode> "NL" .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.ADM1> .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#name> "Provincie Zuid-Holland" .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#officialName> "South Holland"@en .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#officialName> "Zuid-Holland"@nl .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/2743698/> .
+<https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#population> "3804906"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/2752375/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/2752375/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.68333"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2752375/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "3.76667"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#countryCode> "NL" .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#L> .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#L.LCTY> .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#name> "Koudekerke" .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/2744011/> .
+<https://sws.geonames.org/2752375/> <https://www.geonames.org/ontology#parentADM2> <https://sws.geonames.org/6544251/> .
+<https://sws.geonames.org/2921044/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.5"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.5"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Duitschland" .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Federal Republic of Germany"@en .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#countryCode> "DE" .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.PCLI> .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#historicalName> "West Germany"@en .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#name> "Federal Republic of Germany" .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#officialName> "Bundesrepublik Deutschland"@de .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#officialName> "Deutschland"@de .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#officialName> "Duitsland"@nl .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#officialName> "Germany"@en .
+<https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#population> "82927922"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/2967681/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/2967681/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.19161"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2967681/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "6.40533"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#countryCode> "FR" .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.ADM2> .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#name> "Vosges" .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/11071622/> .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#parentADM2> <https://sws.geonames.org/2967681/> .
+<https://sws.geonames.org/2967681/> <https://www.geonames.org/ontology#population> "358700"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/5128581/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/5128581/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "40.71427"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/5128581/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-74.00597"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#colloquialName> "Big Apple"@en .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#countryCode> "US" .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#P> .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#P.PPL> .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#name> "New York City" .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#parentADM1> <https://sws.geonames.org/5128638/> .
+<https://sws.geonames.org/5128581/> <https://www.geonames.org/ontology#population> "8804190"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/6255146/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/6255146/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "7.1881"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/6255146/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "21.09375"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#colloquialName> "el Continente Negro"@es .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#L> .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#L.CONT> .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#name> "Africa" .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#officialName> "Africa"@en .
+<https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#population> "1031833000"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sws.geonames.org/8354410/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
+<https://sws.geonames.org/8354410/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.19498"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/8354410/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.51559"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#countryCode> "DE" .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.PCLH> .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#historicalName> "DDR"@de .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#historicalName> "SBZ"@de .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#historicalName> "Sowjetische Besatzungszone"@de .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#name> "German Democratic Republic" .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#officialName> "German Democratic Republic"@en .
+<https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#shortName> "East Germany"@en .
