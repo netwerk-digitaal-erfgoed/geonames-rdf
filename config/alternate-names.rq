@@ -1,4 +1,5 @@
 PREFIX fx: <http://sparql.xyz/facade-x/ns/>
+PREFIX gn: <https://www.geonames.org/ontology#>
 PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 
 # Map GeoNames' alternateNamesV2 table to language-tagged names, and its 'wkdt' rows to Wikidata
@@ -21,6 +22,7 @@ PREFIX xyz: <http://sparql.xyz/facade-x/data/>
 # the opposite priority, but only because it has no historic or colloquial predicate to lose to.
 CONSTRUCT {
     ?uri ?predicate ?object .
+    ?uri ?shortNamePredicate ?object .
 }
 WHERE {
     SERVICE <x-sparql-anything:> {
@@ -97,5 +99,31 @@ WHERE {
                 IF(BOUND(?isColloquial), "colloquialName",
                 IF(BOUND(?isPreferredName), "officialName",
                 IF(BOUND(?isShortName), "shortName", "alternateName"))))))) AS ?predicate)
+
+        # The chain above tests isPreferredName before isShortName, so a row carrying both flags is
+        # published as gn:officialName alone and its short-name status is lost. 32,184 rows carry
+        # both, 622 of them in Dutch and 11,928 in English, and the flag is the one GeoNames offers
+        # to tell ‘California’ from ‘State of California’ – its readme defines isShortName by that
+        # very example. It is also what separates a feature's two official names in a language: of
+        # the 8,266 features with several English preferred names, 8,264 have exactly one flagged
+        # short, so a consumer choosing a single label can follow GeoNames rather than guess.
+        #
+        # Publish both predicates for those rows instead of choosing between them. Historic and
+        # colloquial rows keep the single predicate the chain gives them: an obsolete or slang form
+        # should not also be asserted as the current short name. A wkdt row is excluded for the same
+        # reason it is excluded above – it carries a QID, not a name.
+        #
+        # Testing ?predicate rather than re-deriving the flags keeps the priority chain the single
+        # place that decides what a row is: landing on officialName already means not wkdt, not
+        # historic, not colloquial and isPreferredName set, and reordering the chain later cannot
+        # leave the two conditions disagreeing.
+        #
+        # The else branch names a variable that is never bound: evaluating it raises an error, and
+        # SPARQL 1.1 section 18.5 leaves the assigned variable unbound when an expression errors, so
+        # the second CONSTRUCT triple is simply not emitted. A UNION would express this more plainly
+        # but returns zero triples under fx:slice, as the comment on the BIND chain above records.
+        BIND(IF(?predicate = gn:officialName && BOUND(?isShortName),
+            gn:shortName,
+            ?unboundUnlessPreferredAndShort) AS ?shortNamePredicate)
     }
 }
