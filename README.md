@@ -64,6 +64,16 @@ into `gn:alternateName`. A name flagged both historic (or colloquial) and prefer
 historic, so an obsolete name never lands on `gn:officialName`, which the GeoNames ontology defines
 as a `skos:prefLabel`. `gn:name` remains the untagged main name from the dump’s `name` column.
 
+Alongside those, each feature carries one `nde:preferredName` per language: the name a client should
+display, chosen once here so that no client has to derive it. GeoNames marks names official without
+limiting how many may be official at once – 25 features have several Dutch official names, 8,266
+several English ones – so the choice prefers the official name that is also flagged short (which
+separates 8,264 of those 8,266), then the shortest, and skips names flagged historic or colloquial
+entirely. The predicate is NDE’s rather than `skos:prefLabel`, because the GeoNames ontology already
+makes `gn:officialName` a subproperty of that, and because promoting a plain `gn:alternateName` –
+the only Dutch name 76,511 features have – would make one literal both a `skos:prefLabel` and a
+`skos:altLabel`, which SKOS integrity condition S13 forbids.
+
 The same table aligns 1,111,266 in-scope features to Wikidata, in rows whose language code is the
 pseudo-code `wkdt`. Each becomes a `schema:sameAs` to the Wikidata entity:
 

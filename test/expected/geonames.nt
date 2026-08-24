@@ -30,6 +30,8 @@
 <https://sws.geonames.org/2743698/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/2743698/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/2743698/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "4.66667"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2743698/> <https://def.nde.nl/geonames#preferredName> "South Holland"@en .
+<https://sws.geonames.org/2743698/> <https://def.nde.nl/geonames#preferredName> "Zuid-Holland"@nl .
 <https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#alternateName> "Provincie Zuid-Holland" .
 <https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#countryCode> "NL" .
 <https://sws.geonames.org/2743698/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
@@ -51,6 +53,9 @@
 <https://sws.geonames.org/2921044/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.5"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/2921044/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.5"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/2921044/> <https://def.nde.nl/geonames#preferredName> "Deutschland"@de .
+<https://sws.geonames.org/2921044/> <https://def.nde.nl/geonames#preferredName> "Duitsland"@nl .
+<https://sws.geonames.org/2921044/> <https://def.nde.nl/geonames#preferredName> "Germany"@en .
 <https://sws.geonames.org/2921044/> <https://schema.org/sameAs> <http://www.wikidata.org/entity/Q183> .
 <https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Duitschland" .
 <https://sws.geonames.org/2921044/> <https://www.geonames.org/ontology#alternateName> "Federal Republic of Germany"@en .
@@ -87,6 +92,7 @@
 <https://sws.geonames.org/6255146/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/6255146/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "7.1881"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/6255146/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "21.09375"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/6255146/> <https://def.nde.nl/geonames#preferredName> "Africa"@en .
 <https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#colloquialName> "el Continente Negro"@es .
 <https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#L> .
 <https://sws.geonames.org/6255146/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#L.CONT> .
@@ -96,6 +102,7 @@
 <https://sws.geonames.org/8354410/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Feature> .
 <https://sws.geonames.org/8354410/> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.19498"^^<http://www.w3.org/2001/XMLSchema#float> .
 <https://sws.geonames.org/8354410/> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.51559"^^<http://www.w3.org/2001/XMLSchema#float> .
+<https://sws.geonames.org/8354410/> <https://def.nde.nl/geonames#preferredName> "German Democratic Republic"@en .
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#countryCode> "DE" .
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#featureClass> <https://www.geonames.org/ontology#A> .
 <https://sws.geonames.org/8354410/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#A.PCLH> .

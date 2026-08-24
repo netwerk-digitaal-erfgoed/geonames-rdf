@@ -84,6 +84,20 @@ done | xargs -P "$PARALLELISM" -I{} sh -c '
         || { echo "Failed to map chunk: $chunk" >&2; exit 1; }
 ' _ {}
 
+# Choose one name per feature per language, as nde:preferredName. Done here rather than per chunk
+# because it is an aggregate over every name a feature has, and the table is ordered by
+# alternateNameId, so a feature's rows are scattered across chunks: North Korea's two Dutch official
+# names are 1,562,765 and 2,421,725. Sorting 0.78 GB by a numeric key costs a couple of minutes
+# against a run that already takes ~40, and it keeps the awk streaming with no per-feature state.
+#
+# The chunks carry a header row each, which sorts out of the way of the numeric ids but would still
+# reach awk, so drop it by field: the header's geonameid column is the literal 'geonameid'.
+printf "\nChoosing a preferred name per language...\n"
+cat $DATA_DIR/alternate-names_*.csv \
+    | awk -F'\t' '$2 != "geonameid"' \
+    | LC_ALL=C sort -t"$(printf '\t')" -k2,2n -k3,3 \
+    | awk -f $CONFIG_DIR/preferred-names.awk > $DATA_DIR/preferred-names.nt
+
 # Concatenate the per-chunk N-Triples files. Unlike Turtle, N-Triples has no prefixes or
 # document structure: every line is a self-contained triple, so plain cat is always valid.
-cat $DATA_DIR/*.csv.nt > $OUTPUT_DIR/geonames.nt
+cat $DATA_DIR/*.csv.nt $DATA_DIR/preferred-names.nt > $OUTPUT_DIR/geonames.nt
