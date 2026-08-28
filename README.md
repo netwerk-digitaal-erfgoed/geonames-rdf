@@ -44,11 +44,12 @@ This will download SPARQL Anything if not already available.
 with `test/expected/geonames.nt`. It downloads nothing: the fixtures are already chunked and carry
 the header row the queries expect, which is what `download.sh` would otherwise produce.
 
-The fixtures are rows lifted from the GeoNames dumps, each chosen for a rule the mapping depends
-on – a name flagged both preferred and historic, an `fr_1793` code that is not a language tag, a
-feature with no country code, a name containing a double quote. After deliberately changing a
-query, re-run with `./test.sh --bless` and read the diff: the expected file is small enough to
-review line by line, and that review is the actual test.
+The fixtures are rows lifted from the GeoNames dumps, plus a four-term excerpt of the GeoNames
+ontology, each chosen for a rule the mapping depends on – a name flagged both preferred and
+historic, an `fr_1793` code that is not a language tag, a feature with no country code, a name
+containing a double quote, an ontology label wrapped across two source lines. After deliberately
+changing a query, re-run with `./test.sh --bless` and read the diff: the expected file is small
+enough to review line by line, and that review is the actual test.
 
 ## Output
 
@@ -83,3 +84,20 @@ The object keeps the `http` scheme although the predicate is `https`. That is no
 `http://www.wikidata.org/entity/` is the only form Wikidata’s dumps and its SPARQL endpoint use, and
 RDF compares URIs as strings, so the `https` variant is a different node that joins with nothing.
 
+GeoNames’ own [ontology](https://www.geonames.org/ontology/ontology_v3.3.rdf) is republished
+alongside the features, because it is what defines the feature-class and feature-code IRIs the
+mapping mints. `gn:featureCode` points at IRIs such as
+`https://www.geonames.org/ontology#P.PPLA`, and without the ontology those are bare subjects that
+carry no triple at all, so a consumer can dereference the code but never label it. The file adds
+690 `gn:Code` instances – one per feature code, each with `skos:prefLabel`, `skos:definition`,
+`skos:notation` and a `skos:inScheme` to its `gn:Class` – plus the nine classes and the property
+axioms, ~6,800 triples next to 13.5M features.
+
+Labels are in en, ru, sv, bg and no; there is no Dutch, so a scope note derived from them stays
+English. Note that they are `skos:prefLabel` and `skos:definition`, **not** `gn:name`: a consumer
+reading `gn:featureCode/gn:name` gets nothing and has to move to `gn:featureCode/skos:prefLabel`.
+
+The triples are copied verbatim except for literal whitespace, which is collapsed to single spaces
+and trimmed. The source is pretty-printed XML, so a handful of labels arrive carrying a newline and
+its indentation – `gn:P.PPLA`’s English `skos:prefLabel`, the label of the term consumers most
+often show, is one of them.

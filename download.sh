@@ -82,3 +82,14 @@ curl -fsS "https://download.geonames.org/export/dump/admin1CodesASCII.txt" >> $D
 
 cp $CONFIG_DIR/headers-admin2-codes.csv $DATA_DIR/admin2-codes.csv
 curl -fsS "https://download.geonames.org/export/dump/admin2Codes.txt" >> $DATA_DIR/admin2-codes.csv
+
+# GeoNames’ own ontology, which defines the gn:featureClass and gn:featureCode IRIs that
+# config/places.rq mints (690 gn:Code instances with skos:prefLabel, skos:definition,
+# skos:notation and skos:inScheme). Without it those IRIs are bare subjects and consumers have
+# nothing to label a feature’s code with. It is a fetch-and-republish, not a mapping, so it sits
+# here with the other supporting files; map.sh only converts it from RDF/XML to N-Triples.
+#
+# The version is pinned because GeoNames publishes each one under its own filename and there is
+# no “latest” alias; bump it here when a v3.4 appears.
+printf "\nDownloading the GeoNames ontology... "
+curl -fsS "https://www.geonames.org/ontology/ontology_v3.3.rdf" -o $DATA_DIR/ontology.rdf

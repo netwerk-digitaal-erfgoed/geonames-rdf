@@ -114,3 +114,20 @@
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#P.PPLA2> .
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#name> "Batifa" .
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#population> "28000"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://www.geonames.org/ontology#featureCode> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://www.geonames.org/ontology#featureCode> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of the feature, as defined in geonames taxonomy."@en .
+<https://www.geonames.org/ontology#featureCode> <http://www.w3.org/2000/01/rdf-schema#domain> <https://www.geonames.org/ontology#Feature> .
+<https://www.geonames.org/ontology#featureCode> <http://www.w3.org/2000/01/rdf-schema#label> "feature code"@en .
+<https://www.geonames.org/ontology#featureCode> <http://www.w3.org/2000/01/rdf-schema#range> <https://www.geonames.org/ontology#Code> .
+<https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Code> .
+<https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#definition> "a city, town, village, or other agglomeration of buildings where people live and work"@en .
+<https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#inScheme> <https://www.geonames.org/ontology#P> .
+<https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#notation> "P.PPL" .
+<https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#prefLabel> "populated place"@en .
+<https://www.geonames.org/ontology#P.PPLA> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Code> .
+<https://www.geonames.org/ontology#P.PPLA> <http://www.w3.org/2004/02/skos/core#definition> "seat of a first-order administrative division (PPLC takes precedence over PPLA)"@en .
+<https://www.geonames.org/ontology#P.PPLA> <http://www.w3.org/2004/02/skos/core#inScheme> <https://www.geonames.org/ontology#P> .
+<https://www.geonames.org/ontology#P.PPLA> <http://www.w3.org/2004/02/skos/core#notation> "P.PPLA" .
+<https://www.geonames.org/ontology#P.PPLA> <http://www.w3.org/2004/02/skos/core#prefLabel> "seat of a first-order administrative division"@en .
+<https://www.geonames.org/ontology#P> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Class> .
+<https://www.geonames.org/ontology#P> <http://www.w3.org/2000/01/rdf-schema#comment> "city, village,..."@en .

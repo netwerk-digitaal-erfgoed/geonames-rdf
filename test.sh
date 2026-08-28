@@ -26,7 +26,7 @@ for path in config bin sparql-anything.env map.sh; do
     ln -s "$REPO/$path" "$work/$path"
 done
 mkdir "$work/data"
-cp "$REPO"/test/fixtures/*.csv "$work/data/"
+cp "$REPO"/test/fixtures/*.csv "$REPO"/test/fixtures/ontology.rdf "$work/data/"
 
 echo "Mapping fixtures..."
 ( cd "$work" && OUTPUT_DIR="$work/output" ./map.sh >"$work/map.log" 2>&1 ) || {

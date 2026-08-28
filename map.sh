@@ -21,6 +21,13 @@ fi
 # Map admin codes.
 java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DIR/admin-codes.ttl
 
+# Convert GeoNames’ own ontology from RDF/XML to N-Triples so it can be concatenated with the
+# mapped chunks below. It defines the gn:featureClass and gn:featureCode IRIs config/places.rq
+# mints, which nothing else in the output describes. Unlike the chunks it is loaded whole
+# (~6,800 triples) rather than read through Facade-X, so it needs no {SOURCE} substitution.
+java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/ontology.rq --load $DATA_DIR/ontology.rdf \
+    --format NT --output $DATA_DIR/ontology.nt
+
 # Remove stale chunk outputs from a previous run, so the cat below can only pick up .nt files
 # this run produced (relevant when map.sh is run standalone without download.sh).
 rm -f $DATA_DIR/*.csv.nt
@@ -86,4 +93,4 @@ done | xargs -P "$PARALLELISM" -I{} sh -c '
 
 # Concatenate the per-chunk N-Triples files. Unlike Turtle, N-Triples has no prefixes or
 # document structure: every line is a self-contained triple, so plain cat is always valid.
-cat $DATA_DIR/*.csv.nt > $OUTPUT_DIR/geonames.nt
+cat $DATA_DIR/*.csv.nt $DATA_DIR/ontology.nt > $OUTPUT_DIR/geonames.nt

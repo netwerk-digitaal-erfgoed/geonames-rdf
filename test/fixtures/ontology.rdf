@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- A four-term excerpt of https://www.geonames.org/ontology/ontology_v3.3.rdf, kept verbatim
+     down to the xml:base that makes rdf:about="#P.PPLA" resolve to the IRI config/places.rq
+     mints. Chosen for the rules config/ontology.rq depends on: a gn:Code whose English
+     prefLabel is wrapped across two source lines (#P.PPLA), one that is not (#P.PPL), the
+     gn:Class the two point at, and a property axiom to show the vocabulary itself is carried
+     along with the codes. -->
+<rdf:RDF
+         xml:base="https://www.geonames.org/ontology"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:gn="https://www.geonames.org/ontology#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+  <owl:ObjectProperty rdf:about="#featureCode">
+    <rdfs:comment xml:lang="en">Type of the feature, as defined in geonames taxonomy.</rdfs:comment>
+    <rdfs:domain rdf:resource="#Feature"/>
+    <rdfs:label xml:lang="en">feature code</rdfs:label>
+    <rdfs:range rdf:resource="#Code"/>
+  </owl:ObjectProperty>
+
+  <gn:Class rdf:about="#P">
+    <rdfs:comment xml:lang="en">city, village,...</rdfs:comment>
+  </gn:Class>
+
+  <gn:Code rdf:about="#P.PPL"
+                 skos:notation="P.PPL">
+    <skos:definition xml:lang="en">a city, town, village, or other agglomeration of buildings where people live and work</skos:definition>
+    <skos:inScheme rdf:resource="#P"/>
+    <skos:prefLabel xml:lang="en">populated place</skos:prefLabel>
+  </gn:Code>
+
+  <gn:Code rdf:about="#P.PPLA"
+                 skos:notation="P.PPLA">
+    <skos:definition xml:lang="en">seat of a first-order administrative division (PPLC takes precedence over PPLA)</skos:definition>
+    <skos:inScheme rdf:resource="#P"/>
+    <skos:prefLabel xml:lang="en">seat of a first-order administrative
+            division</skos:prefLabel>
+  </gn:Code>
+
+</rdf:RDF>
