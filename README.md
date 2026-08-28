@@ -89,15 +89,15 @@ alongside the features, because it is what defines the feature-class and feature
 mapping mints. `gn:featureCode` points at IRIs such as
 `https://www.geonames.org/ontology#P.PPLA`, and without the ontology those are bare subjects that
 carry no triple at all, so a consumer can dereference the code but never label it. The file adds
-690 `gn:Code` instances – one per feature code, each with `skos:prefLabel`, `skos:definition`,
-`skos:notation` and a `skos:inScheme` to its `gn:Class` – plus the nine classes and the property
-axioms, ~6,800 triples next to 13.5M features.
+690 `gn:Code` instances – one per feature code, each with `skos:prefLabel` and `skos:notation`,
+and most with a `skos:definition` (621 of them) and a `skos:inScheme` to its `gn:Class` (689) –
+plus the nine classes and the property axioms, ~6,800 triples next to 13.5M features.
 
 Labels are in en, ru, sv, bg and no; there is no Dutch, so a scope note derived from them stays
 English. Note that they are `skos:prefLabel` and `skos:definition`, **not** `gn:name`: a consumer
 reading `gn:featureCode/gn:name` gets nothing and has to move to `gn:featureCode/skos:prefLabel`.
 
 The triples are copied verbatim except for literal whitespace, which is collapsed to single spaces
-and trimmed. The source is pretty-printed XML, so a handful of labels arrive carrying a newline and
-its indentation – `gn:P.PPLA`’s English `skos:prefLabel`, the label of the term consumers most
-often show, is one of them.
+and trimmed. That changes 27 literals in v3.3: two arrive wrapped across two lines, carrying a
+newline and its indentation – one is `gn:P.PPLA`’s English `skos:prefLabel`, the label of the term
+consumers most often show – and 25 carry a stray double space.
