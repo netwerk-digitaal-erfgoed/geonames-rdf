@@ -35,8 +35,11 @@ echo "Mapping fixtures..."
     exit 1
 }
 
-# Chunks are mapped in parallel, so line order in the concatenated output is not stable.
-sort "$work/output/geonames.nt" > "$work/actual.nt"
+# Chunks are mapped in parallel, so line order in the concatenated output is not stable. Sort in
+# the C locale: collation is locale-dependent, and the ontology’s mixed-case IRIs sort differently
+# on macOS than on the Linux CI runner, which would fail the diff on the developer’s machine or CI
+# depending on where the expected file was blessed. Byte order is the same everywhere.
+LC_ALL=C sort "$work/output/geonames.nt" > "$work/actual.nt"
 
 if $bless; then
     cp "$work/actual.nt" "$REPO/test/expected/geonames.nt"
