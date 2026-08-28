@@ -114,6 +114,11 @@
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#featureCode> <https://www.geonames.org/ontology#P.PPLA2> .
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#name> "Batifa" .
 <https://sws.geonames.org/97825/> <https://www.geonames.org/ontology#population> "28000"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://www.geonames.org/ontology#L.REP> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Code> .
+<https://www.geonames.org/ontology#L.REP> <http://www.w3.org/2002/07/owl#deprecated> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://www.geonames.org/ontology#L.REP> <http://www.w3.org/2004/02/skos/core#inScheme> <https://www.geonames.org/ontology#L> .
+<https://www.geonames.org/ontology#L.REP> <http://www.w3.org/2004/02/skos/core#notation> "L.REP" .
+<https://www.geonames.org/ontology#L.REP> <http://www.w3.org/2004/02/skos/core#prefLabel> "republic"@en .
 <https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.geonames.org/ontology#Code> .
 <https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#definition> "a city, town, village, or other agglomeration of buildings where people live and work"@en .
 <https://www.geonames.org/ontology#P.PPL> <http://www.w3.org/2004/02/skos/core#inScheme> <https://www.geonames.org/ontology#P> .
