@@ -27,6 +27,11 @@ java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/admin-codes.rq > $DATA_DI
 # (~6,800 triples) rather than read through Facade-X, so it needs no {SOURCE} substitution.
 java -jar $BIN_DIR/$SPARQL_ANYTHING_JAR -q $CONFIG_DIR/ontology.rq --load $DATA_DIR/ontology.rdf \
     --format NT --output $DATA_DIR/ontology.nt
+# SPARQL Anything exits 0 when --load cannot read or parse its file: it logs, writes an empty
+# --output and stops. set -eu therefore never trips, and the cat below would ship a geonames.nt
+# missing every ontology triple while the run stays green -- the same silent drop the chunk
+# worker guards against. An empty result is never legitimate here, so treat it as a failure.
+[ -s "$DATA_DIR/ontology.nt" ] || { echo "Ontology conversion produced no triples" >&2; exit 1; }
 
 # Remove stale chunk outputs from a previous run, so the cat below can only pick up .nt files
 # this run produced (relevant when map.sh is run standalone without download.sh).
