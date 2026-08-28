@@ -26,7 +26,7 @@ for path in config bin sparql-anything.env map.sh; do
     ln -s "$REPO/$path" "$work/$path"
 done
 mkdir "$work/data"
-cp "$REPO"/test/fixtures/*.csv "$work/data/"
+cp "$REPO"/test/fixtures/*.csv "$REPO"/test/fixtures/ontology.rdf "$work/data/"
 
 echo "Mapping fixtures..."
 ( cd "$work" && OUTPUT_DIR="$work/output" ./map.sh >"$work/map.log" 2>&1 ) || {
@@ -35,8 +35,11 @@ echo "Mapping fixtures..."
     exit 1
 }
 
-# Chunks are mapped in parallel, so line order in the concatenated output is not stable.
-sort "$work/output/geonames.nt" > "$work/actual.nt"
+# Chunks are mapped in parallel, so line order in the concatenated output is not stable. Sort in
+# the C locale: collation is locale-dependent, and the ontology’s mixed-case IRIs sort differently
+# on macOS than on the Linux CI runner, which would fail the diff on the developer’s machine or CI
+# depending on where the expected file was blessed. Byte order is the same everywhere.
+LC_ALL=C sort "$work/output/geonames.nt" > "$work/actual.nt"
 
 if $bless; then
     cp "$work/actual.nt" "$REPO/test/expected/geonames.nt"

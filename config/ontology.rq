@@ -1,0 +1,24 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# Republish GeoNames’ own ontology as-is, normalising literal whitespace.
+#
+# The ontology is already the vocabulary this dataset uses – config/places.rq mints
+# gn:featureClass and gn:featureCode IRIs that only this file defines – so the triples are
+# copied unchanged rather than mapped. The only edit is whitespace: the source is
+# pretty-printed XML, so a label wrapped across two lines arrives carrying the newline and
+# its indentation (gn:P.PPLA’s English prefLabel is the one that matters, being exactly the
+# label consumers show). Runs of whitespace are collapsed to a single space and the ends
+# trimmed, which changes 27 literals in v3.3: two wrapped across lines and 25 carrying a stray
+# double space. Every literal without such a run is passed through unchanged.
+CONSTRUCT {
+    ?subject ?predicate ?normalizedObject .
+}
+WHERE {
+    ?subject ?predicate ?object .
+    BIND(REPLACE(REPLACE(STR(?object), "\\s+", " "), "^ | $", "") AS ?text)
+    BIND(
+        IF(!isLiteral(?object), ?object,
+            IF(LANG(?object) != "", STRLANG(?text, LANG(?object)),
+                IF(DATATYPE(?object) = xsd:string, ?text, STRDT(?text, DATATYPE(?object)))))
+        AS ?normalizedObject)
+}
