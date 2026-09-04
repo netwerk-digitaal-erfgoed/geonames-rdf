@@ -1,0 +1,26 @@
+{
+  "name": "geonames-rdf",
+  "private": true,
+  "type": "module",
+  "description": "LDE-based conversion of the GeoNames dumps to RDF, next to the shell scripts that do the same",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "download": "node lde/download.ts",
+    "map": "node lde/map.ts",
+    "typecheck": "tsc",
+    "test": "./test.sh"
+  },
+  "dependencies": {
+    "@lde/dataset": "^0.7.9",
+    "@lde/distribution-downloader": "^0.6.8",
+    "@lde/sparql-anything": "^0.1.2",
+    "@lde/task-runner-native": "^0.2.18",
+    "node-stream-zip": "^1.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

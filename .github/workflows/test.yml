@@ -15,10 +15,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      # The LDE mapper runs on Node directly; there is no build step, Node strips the types.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
       # The jar is ~170 MB and pinned, so cache it on the pin rather than downloading it per run.
       - run: . ./sparql-anything.env && echo "SPARQL_ANYTHING_JAR=$SPARQL_ANYTHING_JAR" >> $GITHUB_ENV
       - uses: actions/cache@v6
         with:
           path: bin/${{ env.SPARQL_ANYTHING_JAR }}
           key: ${{ env.SPARQL_ANYTHING_JAR }}
+      # Runs both mappers, map.sh and lde/map.ts, against the same expected file.
       - run: ./test.sh

@@ -3,3 +3,5 @@
 bin/
 data/
 temp/
+node_modules/
+output/
