@@ -1,8 +1,13 @@
 # GeoNames RDF
 
-This repository contains shell scripts that download [GeoNames data dumps](https://download.geonames.org/export/dump/)
-and convert them to RDF using [SPARQL Anything](https://github.com/SPARQL-Anything/sparql.anything),
+This repository downloads [GeoNames data dumps](https://download.geonames.org/export/dump/)
+and converts them to RDF using [SPARQL Anything](https://github.com/SPARQL-Anything/sparql.anything),
 resulting in a `geonames.nt` file that you can load into a SPARQL server.
+
+The conversion exists twice, side by side, and you can run either: as shell scripts (`download.sh`
+and `map.sh`), and as a port to the [LDElements](https://ldelements.org) packages
+(`lde/download.ts` and `lde/map.ts`). Both run the same SPARQL queries in `config/` and produce the
+same output; see [Two implementations](#two-implementations) for what differs.
 
 You can download a periodically updated RDF file from
 https://geonames.ams3.digitaloceanspaces.com/geonames.nt.gz (~770 MB). SPARQL servers generally
@@ -16,13 +21,13 @@ You can run the transform process in a Docker container or directly on your host
 
 ### In Docker
 
-To run the transform process in a Docker container, run:
+The published image runs the shell scripts. To run the transform process in a Docker container, run:
 
 ```shell
 docker run -v $(pwd)/output:/output --rm ghcr.io/netwerk-digitaal-erfgoed/geonames-rdf
 ```
 
-### Directly
+### Directly, with the shell scripts
 
 To run the scripts directly, run:
 
@@ -38,11 +43,65 @@ Then start the mapping process with:
 
 This will download SPARQL Anything if not already available.
 
+### Directly, with LDE
+
+The LDE port needs Node.js 24 or later, which runs the TypeScript files as they are, without a
+build step:
+
+```shell
+npm ci
+node lde/download.ts
+node lde/map.ts
+```
+
+The same environment variables apply to both: `CHUNK_SIZE` (rows per chunk, default 1,000,000),
+`PARALLELISM` (chunks mapped at once, default: CPU count capped by memory), `JAVA_XMX` (heap per
+chunk process, default `2g`) and `OUTPUT_DIR` (default `output`).
+
+### In GitHub Actions
+
+The weekly [harvest workflow](.github/workflows/harvest.yml) runs the shell scripts. Start it by
+hand and it asks which of the two conversions to run; everything after `output/geonames.nt` –
+compression and publication – is shared.
+
+## Two implementations
+
+The shell scripts and the LDE port are meant to be read next to each other. They share every
+piece that is about GeoNames: the queries in `config/`, the header rows, the pinned SPARQL Anything
+build in `sparql-anything.env` and the environment variables above. Both produce the same
+`geonames.nt`, which `test.sh` checks by diffing both against one expected file. What differs is
+where the generic parts live.
+
+Measured on a laptop over the full dumps, `lde/download.ts` takes 95 s where `download.sh` takes
+228 s, because it reads the 2 GB table twice instead of five times. Mapping takes the same time in
+both, since the work is the JVMs either way. The port is about twice as many lines.
+
+| Concern | Shell scripts | LDE port |
+| --- | --- | --- |
+| Downloading | `curl -fsSO` and `unzip` in a `temp` directory | `LastModifiedDownloader` from `@lde/distribution-downloader`, given a `Distribution` per dump |
+| Chunking a 2 GB table | `split -l`, then a loop prepending the header to each chunk | `chunk()` from `@lde/sparql-anything`, with the header and the `.csv` extension as options |
+| Synthesising the `adm1`/`adm2` foreign keys | `awk` | A line transform in `lde/download.ts` |
+| Dropping alternate names of out-of-scope features | Two `awk` passes through a temporary id file | The same transform notes the excluded ids as it goes; a second one filters on them |
+| One JVM per chunk, N at a time | `xargs -P` over a `sh -c` worker that substitutes `{SOURCE}` with `sed` | `SparqlAnythingConverter.convert()` with `concurrency` |
+| A crashed chunk must fail the run | `set -e`, a marker line and a non-zero exit from the worker | `convert()` rejects, and stops the chunks still running |
+| SPARQL Anything exiting 0 on an unreadable `--load` | An explicit `[ -s … ]` check after the ontology step | `convert()` rejects on any empty output |
+| Concatenating in a stable order | `cat data/*.csv.nt data/ontology.nt` | `convert()` concatenates in the order the jobs were given |
+| Sizing the worker pool | `nproc`, the cgroup limit and `/proc/meminfo` | The same arithmetic in `lde/map.ts`: the converter cannot see the machine its task runner uses |
+
+The rows that moved into a package are the ones any tabular-to-RDF conversion needs: running
+chunks a few at a time, concatenating them in order, stopping everything when one fails, and the
+two guards against a run that stays green with triples missing. The rows that stayed in this
+repository are GeoNames policy (which dumps, which ontology version, the foreign keys `places.rq`
+joins on, which features are in scope) and the deployment arithmetic that only the caller can do.
+`map.sh` is the original: `test.sh --bless` regenerates the expected output from it, and the port
+has to reproduce that output.
+
 ## Tests
 
-`./test.sh` maps the fixtures in `test/fixtures` with the real `map.sh` and compares the result
-with `test/expected/geonames.nt`. It downloads nothing: the fixtures are already chunked and carry
-the header row the queries expect, which is what `download.sh` would otherwise produce.
+`./test.sh` maps the fixtures in `test/fixtures` with both `map.sh` and `lde/map.ts` and compares
+each result with `test/expected/geonames.nt`; name one of them (`./test.sh lde`) to run only that
+mapper. It downloads nothing: the fixtures are already chunked and carry the header row the queries
+expect, which is what `download.sh` or `lde/download.ts` would otherwise produce.
 
 The fixtures are rows lifted from the GeoNames dumps, plus a four-term excerpt of the GeoNames
 ontology, each chosen for a rule the mapping depends on – a name flagged both preferred and
