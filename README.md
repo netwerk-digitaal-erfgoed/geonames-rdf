@@ -67,10 +67,14 @@ compression and publication – is shared.
 ## Two implementations
 
 The shell scripts and the LDE port are meant to be read next to each other. They share every
-piece that is about GeoNames – the queries in `config/`, the header rows, the pinned SPARQL Anything
-build in `sparql-anything.env`, the environment variables above – and produce the same
+piece that is about GeoNames: the queries in `config/`, the header rows, the pinned SPARQL Anything
+build in `sparql-anything.env` and the environment variables above. Both produce the same
 `geonames.nt`, which `test.sh` checks by diffing both against one expected file. What differs is
-where the parts that are *not* about GeoNames live.
+where the generic parts live.
+
+Measured on a laptop over the full dumps, `lde/download.ts` takes 95 s where `download.sh` takes
+228 s, because it reads the 2 GB table twice instead of five times. Mapping takes the same time in
+both, since the work is the JVMs either way. The port is about twice as many lines.
 
 | Concern | Shell scripts | LDE port |
 | --- | --- | --- |
@@ -79,19 +83,18 @@ where the parts that are *not* about GeoNames live.
 | Synthesising the `adm1`/`adm2` foreign keys | `awk` | A line transform in `lde/download.ts` |
 | Dropping alternate names of out-of-scope features | Two `awk` passes through a temporary id file | The same transform notes the excluded ids as it goes; a second one filters on them |
 | One JVM per chunk, N at a time | `xargs -P` over a `sh -c` worker that substitutes `{SOURCE}` with `sed` | `SparqlAnythingConverter.convert()` with `concurrency` |
-| Loading the admin-codes lookup beside a query | `--load` inside the worker’s `case` | The job’s `load` field |
 | A crashed chunk must fail the run | `set -e`, a marker line and a non-zero exit from the worker | `convert()` rejects, and stops the chunks still running |
 | SPARQL Anything exiting 0 on an unreadable `--load` | An explicit `[ -s … ]` check after the ontology step | `convert()` rejects on any empty output |
 | Concatenating in a stable order | `cat data/*.csv.nt data/ontology.nt` | `convert()` concatenates in the order the jobs were given |
-| Following progress | Each worker echoes `Processing …` as its chunk starts | The `onChunkConverted` callback, called with `index`/`total` as each chunk finishes |
 | Sizing the worker pool | `nproc`, the cgroup limit and `/proc/meminfo` | The same arithmetic in `lde/map.ts`: the converter cannot see the machine its task runner uses |
 
-The rows that moved into a package are the ones any tabular-to-RDF conversion needs: bounded
-fan-out over chunks with ordered concatenation and abort-with-cleanup, and the two silent-failure
-guards. The rows that stayed in this repository are GeoNames policy – which dumps, which ontology
-version, the foreign keys `places.rq` joins on, which features are in scope – and the deployment
-arithmetic that only the caller can do. Neither implementation is the reference: the expected
-output is blessed from `map.sh`, and the port has to reproduce it.
+The rows that moved into a package are the ones any tabular-to-RDF conversion needs: running
+chunks a few at a time, concatenating them in order, stopping everything when one fails, and the
+two guards against a run that stays green with triples missing. The rows that stayed in this
+repository are GeoNames policy (which dumps, which ontology version, the foreign keys `places.rq`
+joins on, which features are in scope) and the deployment arithmetic that only the caller can do.
+`map.sh` is the original: `test.sh --bless` regenerates the expected output from it, and the port
+has to reproduce that output.
 
 ## Tests
 
