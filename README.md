@@ -83,6 +83,7 @@ where the parts that are *not* about GeoNames live.
 | A crashed chunk must fail the run | `set -e`, a marker line and a non-zero exit from the worker | `convert()` rejects, and stops the chunks still running |
 | SPARQL Anything exiting 0 on an unreadable `--load` | An explicit `[ -s … ]` check after the ontology step | `convert()` rejects on any empty output |
 | Concatenating in a stable order | `cat data/*.csv.nt data/ontology.nt` | `convert()` concatenates in the order the jobs were given |
+| Following progress | Each worker echoes `Processing …` as its chunk starts | The `onChunkConverted` callback, called with `index`/`total` as each chunk finishes |
 | Sizing the worker pool | `nproc`, the cgroup limit and `/proc/meminfo` | The same arithmetic in `lde/map.ts`: the converter cannot see the machine its task runner uses |
 
 The rows that moved into a package are the ones any tabular-to-RDF conversion needs: bounded

@@ -28,6 +28,10 @@ const converter = new SparqlAnythingConverter({
   // JAVA_XMX (and lower PARALLELISM to match) if CHUNK_SIZE in download.ts is increased.
   heap,
   concurrency,
+  // A conversion is silent for as long as it takes, a quarter of an hour over the GeoNames dumps,
+  // so report each chunk as it finishes. map.sh prints a line as each chunk *starts* instead.
+  onChunkConverted: ({ index, total, chunk, queryFile }) =>
+    console.log(`Converted ${index}/${total}: ${chunk ?? queryFile}`),
 });
 
 // The admin code lookup table the places query joins against. It reads its own two inputs, so
