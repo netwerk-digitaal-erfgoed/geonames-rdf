@@ -3,3 +3,4 @@ bin/*
 fuseki/*
 node_modules/
 output/
+sparql-anything-*/

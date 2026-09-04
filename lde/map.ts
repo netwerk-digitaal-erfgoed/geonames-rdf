@@ -3,19 +3,21 @@
 // what map.sh does with xargs, per-chunk JVMs, --load and cat is what SparqlAnythingConverter
 // does, and what it guards against – a crashed chunk silently dropped from the output, a --load
 // that SPARQL Anything could not read and exited 0 on – it guards against for every caller.
+import { Distribution } from '@lde/dataset';
+import { LastModifiedDownloader } from '@lde/distribution-downloader';
 import { SparqlAnythingConverter } from '@lde/sparql-anything';
 import { NativeTaskRunner } from '@lde/task-runner-native';
-import { createWriteStream, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { access, mkdir, readdir, readFile } from 'node:fs/promises';
 import { availableParallelism, totalmem } from 'node:os';
-import { pipeline } from 'node:stream/promises';
 
 const dataDir = 'data';
 const outputDir = process.env.OUTPUT_DIR ?? 'output';
 await mkdir(outputDir, { recursive: true });
 
 const jarPath = await sparqlAnythingJar();
-const heap = process.env.JAVA_XMX ?? '2g';
+// An empty variable counts as unset, as it does for the shell scripts.
+const heap = process.env.JAVA_XMX || '2g';
 const concurrency = parallelism();
 
 const converter = new SparqlAnythingConverter({
@@ -44,12 +46,15 @@ await converter.convert(
 
 // Everything else is one call: the converter runs the chunks of all jobs through one pool, so the
 // short alternate-names chunks fill in behind the long places chunks instead of waiting for them,
-// and concatenates the outputs in the order given. The places job comes first so the long jobs
-// start first. GeoNames’ own ontology is included whole: it defines the gn:featureClass and
-// gn:featureCode IRIs places.rq mints, which nothing else in the output describes.
+// and concatenates the outputs in the order given. GeoNames’ own ontology is included whole: it
+// defines the gn:featureClass and gn:featureCode IRIs places.rq mints, which nothing else in the
+// output describes. It goes first, as in map.sh: it is one short process, and an ontology.rdf that
+// SPARQL Anything cannot read then fails the run in seconds rather than after every chunk. The
+// places job follows so the long jobs start before the short alternate-names ones fill the tail.
 console.log(`Mapping chunks with concurrency ${concurrency}, -Xmx${heap} per worker`);
 await converter.convert(
   [
+    { queryFile: 'config/ontology.rq', load: `${dataDir}/ontology.rdf` },
     {
       queryFile: 'config/places.rq',
       chunks: await chunksNamed('geonames'),
@@ -59,16 +64,20 @@ await converter.convert(
       queryFile: 'config/alternate-names.rq',
       chunks: await chunksNamed('alternate-names'),
     },
-    { queryFile: 'config/ontology.rq', load: `${dataDir}/ontology.rdf` },
   ],
   `${outputDir}/geonames.nt`,
 );
 
 /** The chunks download.ts wrote for a table, in order. */
 async function chunksNamed(table: string): Promise<string[]> {
-  const chunkName = new RegExp(`^${table}-\\d{4}\\.csv$`);
-  const names = (await readdir(dataDir)).filter((name) => chunkName.test(name));
-  return names.sort().map((name) => `${dataDir}/${name}`);
+  // Four digits or more: chunk() pads to four and grows past 9,999 chunks, so a sort by number.
+  const chunkName = new RegExp(`^${table}-(\\d{4,})\\.csv$`);
+  const numbered = (await readdir(dataDir))
+    .map((name) => ({ name, index: Number(chunkName.exec(name)?.[1]) }))
+    .filter(({ index }) => Number.isInteger(index));
+  return numbered
+    .sort((first, second) => first.index - second.index)
+    .map(({ name }) => `${dataDir}/${name}`);
 }
 
 /**
@@ -78,7 +87,7 @@ async function chunksNamed(table: string): Promise<string[]> {
  * converter cannot size this itself: it does not know the machine its task runner spawns on.
  */
 function parallelism(): number {
-  if (process.env.PARALLELISM !== undefined) {
+  if (process.env.PARALLELISM) {
     return Number(process.env.PARALLELISM);
   }
   const memoryCap = Math.max(1, Math.floor(memoryBytes() / (3 * 1024 ** 3)));
@@ -118,15 +127,17 @@ async function sparqlAnythingJar(): Promise<string> {
   try {
     await access(jarPath);
   } catch {
-    const url = `https://github.com/SPARQL-Anything/sparql.anything/releases/download/${pins.SPARQL_ANYTHING_VERSION}/${pins.SPARQL_ANYTHING_JAR}`;
+    const url = new URL(
+      `https://github.com/SPARQL-Anything/sparql.anything/releases/download/${pins.SPARQL_ANYTHING_VERSION}/${pins.SPARQL_ANYTHING_JAR}`,
+    );
     console.log(`Downloading ${url}...`);
-    const response = await fetch(url);
-    // Fail here rather than writing GitHub’s 404 page to the jar path, which would surface much
-    // later as “Invalid or corrupt jarfile”.
-    if (!response.ok || response.body === null) {
-      throw new Error(`Could not download SPARQL Anything: ${response.status} ${response.statusText}`);
-    }
-    await pipeline(response.body, createWriteStream(jarPath));
+    // The downloader fails on a missing release rather than writing GitHub’s 404 page to the jar
+    // path, and removes a partial file on a failed transfer, so neither can surface much later as
+    // “Invalid or corrupt jarfile” on a jar the check above then accepts.
+    await new LastModifiedDownloader('bin').download(
+      new Distribution(url, 'application/java-archive'),
+      jarPath,
+    );
   }
   return jarPath;
 }

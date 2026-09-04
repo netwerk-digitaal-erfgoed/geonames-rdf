@@ -16,7 +16,8 @@ import { pipeline } from 'node:stream/promises';
 
 const dataDir = 'data';
 const downloadsDir = `${dataDir}/downloads`;
-const chunkRows = Number(process.env.CHUNK_SIZE ?? 1_000_000);
+// An empty variable counts as unset, as it does for the shell scripts.
+const chunkRows = Number(process.env.CHUNK_SIZE || 1_000_000);
 
 // The ontology version is pinned because GeoNames publishes each one under its own filename and
 // there is no “latest” alias; bump it here when a v3.4 appears. Fetched first, so that when the

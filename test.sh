@@ -4,10 +4,10 @@
 # row the queries expect, which is the part download.sh and lde/download.ts would otherwise produce.
 #
 # There are two mappers, map.sh and lde/map.ts, and both are run against the same expected file:
-# that one diff is the proof that the LDE port reproduces the shell pipeline's output. Name one to
+# that one diff is the proof that the LDE port reproduces the shell pipeline’s output. Name one to
 # run only that mapper: ./test.sh map.sh, or ./test.sh lde.
 #
-# Each mapper resolves everything from $PWD -- data, config, bin, sparql-anything.env -- so the test
+# Each mapper resolves everything from $PWD – data, config, bin, sparql-anything.env – so the test
 # needs no hooks in it: it assembles a working directory of that shape in a temporary directory and
 # runs the mapper there. bin is symlinked rather than copied so the SPARQL Anything jar is downloaded
 # once and reused.
@@ -49,7 +49,7 @@ map_fixtures() {
             ( cd "$dir" && OUTPUT_DIR="$dir/output" ./map.sh >"$dir/map.log" 2>&1 ) ;;
         lde)
             # The fixtures are chunked the way download.sh names chunks; lde/download.ts names them
-            # the way @lde/sparql-anything's chunk() does, which is what lde/map.ts looks for.
+            # the way @lde/sparql-anything’s chunk() does, which is what lde/map.ts looks for.
             for fixture in "$dir"/data/*_aa.csv; do
                 mv "$fixture" "$(echo "$fixture" | sed 's/_aa\.csv$/-0000.csv/')"
             done
