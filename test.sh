@@ -26,9 +26,17 @@ for arg in "$@"; do
     case "$arg" in
         --bless) bless=true ;;
         map.sh|lde) mappers="$arg" ;;
-        *) echo "Usage: ./test.sh [--bless] [map.sh|lde]" >&2; exit 2 ;;
+        *) echo "Usage: ./test.sh [--bless | map.sh | lde]" >&2; exit 2 ;;
     esac
 done
+# --bless always blesses from map.sh and then checks lde, so naming a mapper with it is a mistake.
+if $bless && [ "$mappers" != "map.sh lde" ]; then
+    echo "--bless takes no mapper: it blesses from map.sh and then checks lde" >&2
+    exit 2
+fi
+case "$mappers" in *lde*)
+    [ -d "$REPO/node_modules" ] || { echo "node_modules is missing; run npm ci before testing the lde mapper" >&2; exit 2; }
+esac
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

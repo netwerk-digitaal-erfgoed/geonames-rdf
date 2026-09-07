@@ -12,7 +12,7 @@ import { access, mkdir, readdir, readFile } from 'node:fs/promises';
 import { availableParallelism, totalmem } from 'node:os';
 
 const dataDir = 'data';
-const outputDir = process.env.OUTPUT_DIR ?? 'output';
+const outputDir = process.env.OUTPUT_DIR || 'output';
 await mkdir(outputDir, { recursive: true });
 
 const jarPath = await sparqlAnythingJar();
@@ -120,7 +120,7 @@ function memoryBytes(): number {
 async function sparqlAnythingJar(): Promise<string> {
   const pins = Object.fromEntries(
     [...(await readFile('sparql-anything.env', 'utf-8')).matchAll(/\$\{(\w+):=([^}]+)\}/g)].map(
-      ([, name, value]) => [name, process.env[name] ?? value],
+      ([, name, value]) => [name, process.env[name] || value],
     ),
   );
   const jarPath = `bin/${pins.SPARQL_ANYTHING_JAR}`;
