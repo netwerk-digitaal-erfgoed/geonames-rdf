@@ -3,3 +3,6 @@
 bin/
 data/
 temp/
+node_modules/
+output/
+sparql-anything-*/

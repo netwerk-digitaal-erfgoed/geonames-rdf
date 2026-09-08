@@ -4,18 +4,46 @@ on:
   schedule:
     - cron: '0 3 * * 0' # Every Sunday at 03:00 UTC
   workflow_dispatch:
+    inputs:
+      converter:
+        description: 'Which of the two conversions to run: the shell scripts or the LDE port'
+        type: choice
+        options:
+          - shell
+          - lde
+        default: shell
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    # The scheduled run has no inputs, so it takes the shell scripts; a manual run can pick the LDE
+    # port instead. Both write output/geonames.nt, and everything after that is shared.
+    env:
+      CONVERTER: ${{ inputs.converter || 'shell' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '21'
-      - run: ./download.sh
-      - run: ./map.sh
+
+      - if: env.CONVERTER == 'shell'
+        run: ./download.sh
+      - if: env.CONVERTER == 'shell'
+        run: ./map.sh
+
+      - if: env.CONVERTER == 'lde'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - if: env.CONVERTER == 'lde'
+        run: npm ci
+      - if: env.CONVERTER == 'lde'
+        run: node lde/download.ts
+      - if: env.CONVERTER == 'lde'
+        run: node lde/map.ts
+
       - uses: actions/upload-artifact@v7
         with:
           name: geonames-nt
@@ -44,4 +72,3 @@ jobs:
           space_name: geonames
           space_region: ams3
           source: output/geonames.zip
-
