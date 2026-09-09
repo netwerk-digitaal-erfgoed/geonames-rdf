@@ -52,12 +52,14 @@ jobs:
       # - geonames.nt.gz is the one to consume. Loaders read gzip natively (Jena infers it from
       #   the .gz extension), so they load it without an unzip step or staging ~14 GB of plain text.
       # - geonames.zip stays for existing consumers of that URL, which we must not break.
-      # Both use DEFLATE level 9: it is ~10% smaller than zip's default level 6 (858 MB -> ~773 MB)
-      # for ~3x the CPU, which costs a few minutes on a job that already runs 24 and only weekly.
+      # Both use DEFLATE level 6, the default. Level 9 was ~10% smaller (858 MB -> ~773 MB) for
+      # ~3x the CPU, and measured on 2026-09-09 that CPU was 19 of the run's 40 minutes: gzip and
+      # zip are single-threaded, so the other three cores idled for half the job. The bytes are
+      # cheaper than the minutes.
       - run: |
           cd output
-          gzip -9 -k geonames.nt
-          zip -9 geonames.zip geonames.nt
+          gzip -k geonames.nt
+          zip geonames.zip geonames.nt
       - uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.S3_ACCESS_KEY}}
