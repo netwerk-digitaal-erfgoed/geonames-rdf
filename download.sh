@@ -55,7 +55,8 @@ for cfile in $country_files; do
 done
 
 # create foreign keys 'adm1' and 'adm2' for the admin1code and admin2code tables
-# $9=country code, $11=admin1 code, $12=admin2 code
+# $9=country code, $11=admin1 code, $12=admin2 code; the columns are documented in
+# https://download.geonames.org/export/dump/readme.txt
 # Explicit NONE so we don't need OPTIONAL joins, which speeds up the mapping process.
 printf "\nCreating foreign keys... "
 awk 'BEGIN{FS=OFS="\t"} {print $0, $9"."$11, ($12 != "" ? $9"."$11"."$12 : "NONE" )}' $DATA_DIR/geonames.csv > $DATA_DIR/geonamesplus.csv

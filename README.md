@@ -2,7 +2,9 @@
 
 This repository downloads [GeoNames data dumps](https://download.geonames.org/export/dump/)
 and converts them to RDF using [SPARQL Anything](https://github.com/SPARQL-Anything/sparql.anything),
-resulting in a `geonames.nt` file that you can load into a SPARQL server.
+resulting in a `geonames.nt` file that you can load into a SPARQL server. GeoNames documents the
+dumps’ tables and columns in its [readme](https://download.geonames.org/export/dump/readme.txt),
+which is the reference for the header rows in `config/` and for what the queries read.
 
 The conversion exists twice, side by side, and you can run either: as shell scripts (`download.sh`
 and `map.sh`), and as a port to the [LDElements](https://ldelements.org) packages
@@ -116,8 +118,9 @@ After running the transform process, you’ll find a `output/geonames.nt` file
 that you can load into a SPARQL server.
 
 Names come from GeoNames’ [alternateNamesV2](https://download.geonames.org/export/dump/alternateNamesV2.zip)
-table, so they carry a language tag wherever GeoNames records one – about 62% of them do; the rest
-are emitted as plain literals. Following GeoNames’ own RDF, a preferred name becomes
+table (columns in the [readme](https://download.geonames.org/export/dump/readme.txt)), so they carry
+a language tag wherever GeoNames records one – about 62% of them do; the rest are emitted as plain
+literals. Following GeoNames’ own RDF, a preferred name becomes
 `gn:officialName` and a short name `gn:shortName`; unlike that RDF, colloquial and historic names
 keep their distinction as `gn:colloquialName` and `gn:historicalName` instead of being flattened
 into `gn:alternateName`. A name flagged both historic (or colloquial) and preferred is published as
