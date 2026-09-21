@@ -9,17 +9,17 @@ on:
         description: 'Which of the two conversions to run: the shell scripts or the LDE port'
         type: choice
         options:
-          - shell
           - lde
-        default: shell
+          - shell
+        default: lde
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    # The scheduled run has no inputs, so it takes the shell scripts; a manual run can pick the LDE
-    # port instead. Both write output/geonames.nt, and everything after that is shared.
+    # The scheduled run has no inputs, so it takes the LDE port; a manual run can pick the shell
+    # scripts instead. Both write output/geonames.nt, and everything after that is shared.
     env:
-      CONVERTER: ${{ inputs.converter || 'shell' }}
+      CONVERTER: ${{ inputs.converter || 'lde' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6

@@ -60,7 +60,7 @@ chunk process, default `2g`) and `OUTPUT_DIR` (default `output`).
 
 ### In GitHub Actions
 
-The weekly [harvest workflow](.github/workflows/harvest.yml) runs the shell scripts. Start it by
+The weekly [harvest workflow](.github/workflows/harvest.yml) runs the LDE port. Start it by
 hand and it asks which of the two conversions to run; everything after `output/geonames.nt` –
 compression and publication – is shared.
 
