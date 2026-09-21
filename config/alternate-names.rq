@@ -46,9 +46,10 @@ WHERE {
 
         # The isolanguage column doubles as a slot for non-linguistic identifiers: 'wkdt' for the
         # Wikidata ID, 'link' for a URL, plus 'post', 'iata', 'icao', 'nuts', 'unlc' and others that
-        # the readme does not enumerate. Since the set is open-ended, allow only plain ISO 639
-        # codes rather than blocking known offenders. This also drops language variants such as
-        # 'zh-Hant', which about.rdf drops too. 'wkdt' is the one exception, mapped below.
+        # the readme (https://download.geonames.org/export/dump/readme.txt) does not enumerate.
+        # Since the set is open-ended, allow only plain ISO 639 codes rather than blocking known
+        # offenders. This also drops language variants such as 'zh-Hant', which about.rdf drops
+        # too. 'wkdt' is the one exception, mapped below.
         # The test is a variable rather than a bare FILTER because a FILTER constrains the whole
         # group and does not gate the BINDs beside it: the group translates to Filter(c, Extend(...)),
         # so STRLANG below is evaluated for every row, including the ones the FILTER then drops

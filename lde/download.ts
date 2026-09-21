@@ -58,7 +58,8 @@ const allCountriesZip = await downloader.download(
 // Create foreign keys ‘adm1’ and ‘adm2’ for the admin1 and admin2 code tables, in one pass that
 // also notes which features places.rq will leave out. An explicit NONE rather than an empty
 // column, so the query can join without OPTIONAL, which is markedly faster.
-// Columns: $7 feature class, $8 feature code, $9 country code, $11 admin1 code, $12 admin2 code.
+// Columns: $7 feature class, $8 feature code, $9 country code, $11 admin1 code, $12 admin2 code,
+// as documented in https://download.geonames.org/export/dump/readme.txt
 console.log('Creating foreign keys...');
 const excludedIds = new Set<string>();
 await transformLines(
