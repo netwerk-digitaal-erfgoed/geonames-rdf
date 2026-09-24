@@ -14,7 +14,7 @@ same output; see [Two implementations](#two-implementations) for what differs.
 You can download a periodically updated RDF file from
 https://geonames.ams3.digitaloceanspaces.com/geonames.nt.gz (~860 MB). SPARQL servers generally
 read gzip directly – Jena infers it from the `.gz` extension – so you can load it without
-unpacking, which saves staging ~14 GB of plain text. The same data is also
+unpacking, which saves staging 16 GB of plain text. The same data is also
 published as https://geonames.ams3.digitaloceanspaces.com/geonames.zip for existing consumers.
 
 ## Running

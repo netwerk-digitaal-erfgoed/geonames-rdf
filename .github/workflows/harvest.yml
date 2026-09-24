@@ -12,6 +12,10 @@ on:
           - lde
           - shell
         default: lde
+      publish:
+        description: 'Upload the result to S3. Turn off for a dry run that only keeps the artifact.'
+        type: boolean
+        default: true
 
 jobs:
   run:
@@ -20,6 +24,10 @@ jobs:
     # scripts instead. Both write output/geonames.nt, and everything after that is shared.
     env:
       CONVERTER: ${{ inputs.converter || 'lde' }}
+      # Gate publication on the event, not on `inputs.publish`: a scheduled run has no inputs at
+      # all, and in a GitHub expression an absent input is null, which compares EQUAL to false.
+      # `inputs.publish == false` would therefore silently stop the weekly publish.
+      PUBLISH: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -48,26 +56,54 @@ jobs:
         with:
           name: geonames-nt
           path: output/geonames.nt
+      # Refuse to publish a short file. A converter or query change that silently drops rows is
+      # the failure this pipeline is most exposed to: the output stays valid N-Triples and the run
+      # stays green, so the loss only surfaces weeks later as missing places -- the same failure
+      # mode map.sh guards per chunk, here for the file as a whole. A dropped chunk is ~4M triples
+      # and the dump only grows, so the floor has room for normal variation but not for loss.
+      # Raise it when it has been comfortably exceeded for a while; never lower it to pass a run.
+      #
+      # The floor lives here rather than in map.sh because download.sh takes a country_files
+      # variable: a local run converting only NL BE DE produces a few million triples and is
+      # correct. The workflow is the only place that always converts allCountries, and the only
+      # place that publishes.
+      #
+      # The count also goes to the run summary on every run, published or not. It is the only
+      # lasting record of the output's scale: the artifact expires, the cluster keeps one indexer
+      # job and Loki about a day, so comparing a run with last week's is otherwise impossible.
+      - run: |
+          MIN_TRIPLES=130000000
+          TRIPLES=$(wc -l < output/geonames.nt)
+          printf '%s triples, %s bytes\n' "$TRIPLES" "$(wc -c < output/geonames.nt)" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "$TRIPLES" -ge "$MIN_TRIPLES" ] || {
+            echo "Only $TRIPLES triples, below the $MIN_TRIPLES floor -- refusing to publish" >&2
+            exit 1
+          }
+
       # Publish two encodings of the same N-Triples file:
       # - geonames.nt.gz is the one to consume. Loaders read gzip natively (Jena infers it from
-      #   the .gz extension), so they load it without an unzip step or staging ~14 GB of plain text.
+      #   the .gz extension), so they load it without an unzip step or staging 16 GB of plain text.
       # - geonames.zip stays for existing consumers of that URL, which we must not break.
       # Both use DEFLATE level 6, the default. Level 9 was ~10% smaller (858 MB -> ~773 MB) for
       # ~3x the CPU, and measured on 2026-09-09 that CPU was 19 of the run's 40 minutes: gzip and
       # zip are single-threaded, so the other three cores idled for half the job. The bytes are
       # cheaper than the minutes.
-      - run: |
+      - if: env.PUBLISH == 'true'
+        run: |
           cd output
           gzip -k geonames.nt
           zip geonames.zip geonames.nt
-      - uses: BetaHuhn/do-spaces-action@v2
+      - if: env.PUBLISH == 'true'
+        uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.S3_ACCESS_KEY}}
           secret_key: ${{ secrets.S3_SECRET_KEY }}
           space_name: geonames
           space_region: ams3
           source: output/geonames.nt.gz
-      - uses: BetaHuhn/do-spaces-action@v2
+      - if: env.PUBLISH == 'true'
+        uses: BetaHuhn/do-spaces-action@v2
         with:
           access_key: ${{ secrets.S3_ACCESS_KEY}}
           secret_key: ${{ secrets.S3_SECRET_KEY }}
