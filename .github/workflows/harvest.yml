@@ -58,10 +58,20 @@ jobs:
           path: output/geonames.nt
       # Refuse to publish a short file. A converter or query change that silently drops rows is
       # the failure this pipeline is most exposed to: the output stays valid N-Triples and the run
-      # stays green, so the loss only surfaces weeks later as missing places -- the same failure
-      # mode map.sh guards per chunk, here for the file as a whole. A dropped chunk is ~4M triples
-      # and the dump only grows, so the floor has room for normal variation but not for loss.
-      # Raise it when it has been comfortably exceeded for a while; never lower it to pass a run.
+      # stays green, so the loss only surfaces weeks later as missing places.
+      #
+      # The floor is set from the smallest loss worth catching, which is one chunk. The two chunk
+      # sets yield very differently: a places chunk is ~8.7M triples (116773984 over 13472121
+      # rows), an alternate-names chunk only ~0.94M (18063408 over 19200416 rows). The run of
+      # 2026-09-20 produced 134844192, so this floor leaves 844192 of headroom -- under the
+      # ~940000 of the smaller chunk, so losing any single chunk trips it.
+      #
+      # That is deliberately tight, about 0.6%, where week-to-week growth is a few tens of
+      # thousands of triples. A dump that genuinely shrinks by more than that is itself worth an
+      # alert, and the cost of being wrong is asymmetric: a false alarm fails the run and mails
+      # you, leaving last week's file published and the live index untouched, while a missed loss
+      # is served for weeks. Raise the floor as the dump grows, keeping roughly this margin; never
+      # lower it to make a run pass.
       #
       # The floor lives here rather than in map.sh because download.sh takes a country_files
       # variable: a local run converting only NL BE DE produces a few million triples and is
@@ -72,12 +82,12 @@ jobs:
       # lasting record of the output's scale: the artifact expires, the cluster keeps one indexer
       # job and Loki about a day, so comparing a run with last week's is otherwise impossible.
       - run: |
-          MIN_TRIPLES=130000000
+          MIN_TRIPLES=134000000
           TRIPLES=$(wc -l < output/geonames.nt)
           printf '%s triples, %s bytes\n' "$TRIPLES" "$(wc -c < output/geonames.nt)" \
             | tee -a "$GITHUB_STEP_SUMMARY"
           [ "$TRIPLES" -ge "$MIN_TRIPLES" ] || {
-            echo "Only $TRIPLES triples, below the $MIN_TRIPLES floor -- refusing to publish" >&2
+            echo "Only $TRIPLES triples, below the $MIN_TRIPLES floor -- treating the conversion as failed" >&2
             exit 1
           }
 
