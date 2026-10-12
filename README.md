@@ -18,7 +18,8 @@ unpacking, which saves staging 16 GB of plain text. The same data is also
 published as https://files.nde.nl/geonames/geonames.zip for existing consumers.
 
 These URLs redirect to the file, so follow redirects when downloading (`curl -L`). The previous
-addresses under `geonames.ams3.digitaloceanspaces.com` will stop working; switch to the ones above.
+addresses under `geonames.ams3.digitaloceanspaces.com` are no longer updated and will disappear;
+switch to the ones above.
 
 ## Running
 
