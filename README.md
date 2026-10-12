@@ -12,10 +12,13 @@ and `map.sh`), and as a port to the [LDElements](https://ldelements.org) package
 same output; see [Two implementations](#two-implementations) for what differs.
 
 You can download a periodically updated RDF file from
-https://geonames.ams3.digitaloceanspaces.com/geonames.nt.gz (~860 MB). SPARQL servers generally
+https://files.nde.nl/geonames/geonames.nt.gz (~860 MB). SPARQL servers generally
 read gzip directly – Jena infers it from the `.gz` extension – so you can load it without
 unpacking, which saves staging 16 GB of plain text. The same data is also
-published as https://geonames.ams3.digitaloceanspaces.com/geonames.zip for existing consumers.
+published as https://files.nde.nl/geonames/geonames.zip for existing consumers.
+
+These URLs redirect to the file, so follow redirects when downloading (`curl -L`). The previous
+addresses under `geonames.ams3.digitaloceanspaces.com` will stop working; switch to the ones above.
 
 ## Running
 
