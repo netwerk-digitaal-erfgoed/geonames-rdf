@@ -104,26 +104,9 @@ jobs:
           cd output
           gzip -k geonames.nt
           zip geonames.zip geonames.nt
-      - if: env.PUBLISH == 'true'
-        uses: BetaHuhn/do-spaces-action@v2
-        with:
-          access_key: ${{ secrets.S3_ACCESS_KEY}}
-          secret_key: ${{ secrets.S3_SECRET_KEY }}
-          space_name: geonames
-          space_region: ams3
-          source: output/geonames.nt.gz
-      - if: env.PUBLISH == 'true'
-        uses: BetaHuhn/do-spaces-action@v2
-        with:
-          access_key: ${{ secrets.S3_ACCESS_KEY}}
-          secret_key: ${{ secrets.S3_SECRET_KEY }}
-          space_name: geonames
-          space_region: ams3
-          source: output/geonames.zip
-      # Publish to NDE’s SURF object store, served as https://files.nde.nl/geonames/. That is the
-      # address to hand out; the DigitalOcean uploads above only keep the old URLs fresh until
-      # DigitalOcean is switched off. The content types are explicit because the CLI cannot guess
-      # one for .nt.gz, and the store serves what it was given.
+      # Publish to NDE’s SURF object store, served as https://files.nde.nl/geonames/. The content
+      # types are explicit because the CLI cannot guess one for .nt.gz, and the store serves what
+      # it was given.
       - if: env.PUBLISH == 'true'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SURF_S3_ACCESS_KEY }}
